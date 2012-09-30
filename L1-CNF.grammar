@@ -12,7 +12,7 @@ NP -> I
 NP -> she
 NP -> me
 NP -> Houston
-NP -> NWA
+NP -> TWA
 NP -> Det Nominal
 Nominal -> book
 Nominal -> flight

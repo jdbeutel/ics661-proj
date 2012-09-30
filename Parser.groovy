@@ -10,14 +10,13 @@ class Parser {
     Parser(List<String> words, Grammar g) {
         g.normalize()     // CKY requires CNF
         grammar = g
-        words.add(0, 'dummy')  // start words from index 1, to correspond with alg in book
         this.words = words
         parse()
     }
 
     private void parse() {
         for (j in 1..words.size()) {
-            table[j-1][j].addAll(grammar.lexiconOf(words[j]).collect {new Parse(it)})
+            table[j-1][j].addAll(grammar.lexiconOf(words[j-1]).collect {new Parse(it)})
             for (int i = j-2; i >= 0; i--) {    // skips j == 1
                 for (k in i+1..j-1) {
                     for (B in table[i][k]) {
@@ -31,12 +30,33 @@ class Parser {
         }
     }
 
-    List<Parse> getParses() {
-        def completeParses = table[0][words.size()]
-        completeParses.findAll {it.rule.nonTerminal == grammar.startSymbol}
+    List<Parse> getCompletedParses() {
+        def fullParses = table[0][words.size()]
+        fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}
+    }
+
+    String getCompletedParsesString() {
+        completedParses?.join(';') ?: "not ${grammar.startSymbol}"
+    }
+
+    /**
+     * @return a rendering of the parse table along the diagonals, from the terminals to the apex
+     */
+    @Override
+    String toString() {
+        def s = ''
+        for (j in 1..table.size()) {
+            for (i in 0..table.size()-j) {
+                s += "table[$i][${i+j}] = ${table[i][i+j]}\n"
+            }
+        }
+        s
     }
 }
 
+/**
+ * A node in a CKY parse tree.
+ */
 class Parse {
     Rule rule   // A -> B C
     Parse B, C
@@ -47,6 +67,7 @@ class Parse {
     }
 
     Parse(Rule r, Parse b, Parse c) {
+        assert r.binaryForm
         rule = r
         B = b
         C = c

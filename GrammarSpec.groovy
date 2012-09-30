@@ -1,6 +1,9 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
+/**
+ * Test specification of Grammar.
+ */
 class GrammarSpec extends Specification {
 
 
