@@ -7,8 +7,6 @@ if (args.size() != 1) {
 
 def g = new Grammar(new File(args[0]))
 System.in.eachLine {line ->
-    def words = line.tokenize()
-    def p = new Parser(words, g)
-    println p.completedParsesString
-    null    // just avoiding a warning about not returning a value to eachLine
+    println new Parser(line, g).completedParsesString
+    null    // just avoiding a warning about not returning a value from eachLine
 }

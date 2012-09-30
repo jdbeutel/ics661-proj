@@ -7,13 +7,22 @@ class Parser {
     Grammar grammar
     List<List<List<Parse>>> table = [].withDefault {[].withDefault {[]}}
 
-    Parser(List<String> words, Grammar g) {
+    /**
+     * Constructs a Parser.
+     *
+     * @param line the line of words to parse (i.e., a sentence)
+     * @param g the grammar to use for the parse
+     */
+    Parser(String line, Grammar g) {
         g.normalize()     // CKY requires CNF
         grammar = g
-        this.words = words
+        words = line.tokenize()
         parse()
     }
 
+    /**
+     * Does the CKY parse on this parser's line of words, according to its grammar.
+     */
     private void parse() {
         for (j in 1..words.size()) {
             table[j-1][j].addAll(grammar.lexiconOf(words[j-1]).collect {new Parse(it)})
@@ -30,16 +39,24 @@ class Parser {
         }
     }
 
+    /**
+     * @return a list of roots of all accepted, full parse trees, or the empty list if none are accepted
+     */
     List<Parse> getCompletedParses() {
         def fullParses = table[0][words.size()]
         fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}
     }
 
+    /**
+     * @return a rendering of all possible parses, or "not S" if none are accepted
+     */
     String getCompletedParsesString() {
         completedParses?.join(';') ?: "not ${grammar.startSymbol}"
     }
 
     /**
+     * Renders the whole parse table, for debugging.
+     *
      * @return a rendering of the parse table along the diagonals, from the terminals to the apex
      */
     @Override
@@ -55,17 +72,27 @@ class Parser {
 }
 
 /**
- * A node in a CKY parse tree.
+ * A node (i.e., subtree) in a CKY parse tree.
  */
 class Parse {
     Rule rule   // A -> B C
     Parse B, C
 
+    /**
+     * Constructor for a terminal rule.
+     * @param r a Rule in terminal form
+     */
     Parse(Rule r) {
         assert r.terminalForm
         rule = r
     }
 
+    /**
+     * Constructor for a binary rule.
+     * @param r a Rule in binary form
+     * @param b the left subtree node
+     * @param c the right subtree node
+     */
     Parse(Rule r, Parse b, Parse c) {
         assert r.binaryForm
         rule = r
@@ -73,6 +100,9 @@ class Parse {
         C = c
     }
 
+    /**
+     * @return render of the subtree rooted at this node (recursively) in bracket format
+     */
     @Override
     String toString() {
         if (rule.terminalForm) {
