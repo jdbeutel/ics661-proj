@@ -26,7 +26,7 @@ class Grammar {
      * @param i     optional index to insert in rules list, defaults to end
      */
     private void addRule(String line, int i = rules.size()) {
-        def r = new Rule(line)
+        def r = new Rule(line, this)
         if (rules.contains(r)) {
             throw new IllegalArgumentException("duplicate rule $line")
         }
@@ -35,11 +35,16 @@ class Grammar {
 
     /**
      * Constructs a Grammar by parsing the given definition File.
+     * This also validates that the given grammar contains a rule for the start symbol.
+     * The String version of the constructor is less strict, for testing.
      *
      * @param definition    lines defining the grammar, in a File
      */
     Grammar(File definition) {
         this(canonicalEof(definition))
+        if (!(startSymbol in nonTerminals)) {
+            throw new IllegalArgumentException("$definition missing rule for start symbol $startSymbol")
+        }
     }
 
     /**
@@ -80,25 +85,7 @@ class Grammar {
         makeAllRulesBinary()
         removeRulesThatAreUnreachableFromStartSymbol()
 
-        rules.each {assert isNormal(it)}
-    }
-
-    /**
-     * Checks whether the given Rule is valid for CNF.
-     *
-     * @param r the Rule to check
-     * @return  whether the given Rule is valid for CNF
-     */
-    private boolean isNormal(Rule r) {
-        def s = r.symbols
-        switch (s.size()) {
-            case 1:
-                return s[0] in terminals
-            case 2:
-                return s[0] in nonTerminals && s[1] in nonTerminals
-            default:
-                return false
-        }
+        rules.each {assert it.normalForm}
     }
 
     /**
@@ -131,7 +118,7 @@ class Grammar {
      */
     private void convertUnitProductions() {
         Rule r
-        while (r = rules.find {isUnitProduction(it)}) {
+        while (r = rules.find {it.unitProduction}) {
             String redundant = r.symbols[0]
             int i = rules.indexOf(r)
             rules.remove(i)
@@ -139,17 +126,6 @@ class Grammar {
                 addRule("${r.nonTerminal} -> ${q.symbols.join(' ')}", i++)
             }
         }
-    }
-
-    /**
-     * Checks whether the given rule is a unit production.
-     * A unit production is a rule with an RHS of just one non-terminal.
-     *
-     * @param r the rule to check
-     * @return whether r is a unit production
-     */
-    private boolean isUnitProduction(Rule r) {
-        r.symbols.size() == 1 && r.symbols[0] in nonTerminals
     }
 
     /**
@@ -249,13 +225,14 @@ public class Rule {
 
     String nonTerminal
     List<String> symbols
+    Grammar grammar
 
     /**
      * Constructs a Rule from a line of a context-free grammar definition.
      *
      * @param line the single rule to parse, containing ' -> ' separator
      */
-    Rule(String line) {
+    Rule(String line, Grammar g) {
         def parts = line.split(' -> ')
         if (parts.size() < 2) {
             throw new IllegalArgumentException("missing -> separator: $line")
@@ -272,6 +249,38 @@ public class Rule {
         if (!symbols) {
             throw new IllegalArgumentException("missing symbol(s) to the right of -> separator: $line")
         }
+        grammar = g
+    }
+
+    /**
+     * @return whether this rule is in normalized terminal form
+     */
+    boolean isTerminalForm() {
+        symbols.size() == 1 && symbols[0] in grammar.terminals
+    }
+
+    /**
+     * @return whether this rule is in normalized binary form
+     */
+    boolean isBinaryForm() {
+        symbols.size() == 2 && symbols[0] in grammar.nonTerminals && symbols[1] in grammar.nonTerminals
+    }
+
+    /**
+     * @return  whether this Rule is valid for CNF
+     */
+    boolean isNormalForm() {
+        (terminalForm || binaryForm)
+    }
+
+    /**
+     * Checks whether this rule is a unit production.
+     * A unit production is a rule with an RHS of just one non-terminal.
+     *
+     * @return whether this rule is a unit production
+     */
+    boolean isUnitProduction() {
+        symbols.size() == 1 && symbols[0] in grammar.nonTerminals
     }
 
     /**
@@ -310,4 +319,3 @@ public class Rule {
         "$nonTerminal -> ${symbols.join(' ')}"
     }
 }
-
