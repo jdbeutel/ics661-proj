@@ -191,6 +191,35 @@ class Grammar {
     }
 
     /**
+     * Finds all rules with an RHS of the given terminal.
+     * This method scans all the rules, rather than maintaining
+     * a map like this throughout the class, because I would rather
+     * keep this code simple than try to optimize it.
+     *
+     *
+     * @param terminal   the RHS of the rules to find
+     * @return  a list of rules with the given RHS
+     */
+    List<Rule> lexiconOf(String terminal) {
+        rules.findAll {it.terminalForm && it.symbols[0] == terminal}
+    }
+
+    /**
+     * Finds all binary rules with an RHS of the given non-terminals.
+     * This method scans all the rules, rather than maintaining
+     * a map like this throughout the class, because I would rather
+     * keep this code simple than try to optimize it.
+     *
+     *
+     * @param b the first non-terminal on the RHS
+     * @param c the second non-terminal on the RHS
+     * @return  a list of binary rules with the given RHS
+     */
+    List<Rule> rulesTo(String b, String c) {
+        rules.findAll {it.binaryForm && it.symbols[0] == b && it.symbols[1] == c}
+    }
+
+    /**
      * Gets the next available dummy symbol.
      * The symbol is an 'X' followed by an incrementing counter.
      * Symbols already in use are skipped.
@@ -256,7 +285,7 @@ public class Rule {
      * @return whether this rule is in normalized terminal form
      */
     boolean isTerminalForm() {
-        symbols.size() == 1 && symbols[0] in grammar.terminals
+        symbols.size() == 1 && !unitProduction
     }
 
     /**

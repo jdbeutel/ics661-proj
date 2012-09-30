@@ -83,7 +83,7 @@ Noun -> book
 Noun -> flight
 Noun -> meal
 Noun -> money
-Verb ->  book
+Verb -> book
 Verb -> include
 Verb -> prefer
 Pronoun -> I
