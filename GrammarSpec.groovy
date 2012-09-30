@@ -55,7 +55,10 @@ class GrammarSpec extends Specification {
         'S -> a b c'                                        || 'S -> X4 X3\nX4 -> X1 X2\nX1 -> a\nX2 -> b\nX3 -> c'
 
         // the requirement
-        L1_DEF                                      || L1_CNF
+        L1_DEF                  || L1_CNF
+
+        // reflexive
+        L1_CNF                  || L1_CNF
     }
 
     static final L1_DEF = """S -> NP VP
