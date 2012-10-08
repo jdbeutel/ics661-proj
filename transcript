@@ -1,0 +1,28 @@
+Script started on Sun 07 Oct 2012 09:37:48 PM HST
+$ cat sampleInput
+book
+book that flight
+book that flight through Houston
+does this flight include a meal
+I prefer TWA
+I prefer a flight to Houston
+book the flight
+does this flight include a dinner
+book flight
+book flight that
+book book
+$ groovy assignment4 L1-CNF.grammar < sampleInput
+[S book]
+[S [Verb book] [NP [Det that] [Nominal flight]]]
+[S [Verb book] [NP [Det that] [Nominal [Nominal flight] [PP [Preposition through] [NP Houston]]]]];[S [VP [Verb book] [NP [Det that] [Nominal flight]]] [PP [Preposition through] [NP Houston]]];[S [X2 [Verb book] [NP [Det that] [Nominal flight]]] [PP [Preposition through] [NP Houston]]]
+[S [X1 [Aux does] [NP [Det this] [Nominal flight]]] [VP [Verb include] [NP [Det a] [Nominal meal]]]]
+[S [NP I] [VP [Verb prefer] [NP TWA]]]
+[S [NP I] [VP [Verb prefer] [NP [Det a] [Nominal [Nominal flight] [PP [Preposition to] [NP Houston]]]]]];[S [NP I] [VP [VP [Verb prefer] [NP [Det a] [Nominal flight]]] [PP [Preposition to] [NP Houston]]]];[S [NP I] [VP [X2 [Verb prefer] [NP [Det a] [Nominal flight]]] [PP [Preposition to] [NP Houston]]]]
+not S
+not S
+not S
+not S
+not S
+$ exit
+
+Script done on Sun 07 Oct 2012 09:38:06 PM HST

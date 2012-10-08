@@ -191,13 +191,13 @@ class Grammar {
     }
 
     /**
-     * Finds all rules with an RHS of the given terminal.
+     * Finds all rules with an RHS of just the given terminal.
      * This method scans all the rules, rather than maintaining
      * a map like this throughout the class, because I would rather
      * keep this code simple than try to optimize it.
      *
      *
-     * @param terminal   the RHS of the rules to find
+     * @param terminal   the whole RHS of the rules to find
      * @return  a list of rules with the given RHS
      */
     List<Rule> lexiconOf(String terminal) {
@@ -205,7 +205,7 @@ class Grammar {
     }
 
     /**
-     * Finds all binary rules with an RHS of the given non-terminals.
+     * Finds all binary rules with an RHS of the given pair of non-terminals.
      * This method scans all the rules, rather than maintaining
      * a map like this throughout the class, because I would rather
      * keep this code simple than try to optimize it.
@@ -258,8 +258,11 @@ public class Rule {
 
     /**
      * Constructs a Rule from a line of a context-free grammar definition.
+     * This Rule does not add itself to its Grammar; the caller needs to do that,
+     * because it may have a specific place where it wants this Rule to appear in the Grammar.
      *
      * @param line the single rule to parse, containing ' -> ' separator
+     * @param g the Grammar that will contain this Rule, determining whether or not a given symbol is a terminal
      */
     Rule(String line, Grammar g) {
         def parts = line.split(' -> ')
@@ -328,13 +331,13 @@ public class Rule {
         }
     }
 
-    // for convenient use in HashSet
+    // for convenient duplicate check in List
     @Override
     boolean equals(Object other) {
         other instanceof Rule && nonTerminal == other.nonTerminal && symbols == other.symbols
     }
 
-    // for convenient use in HashSet
+    // for consistency with equals()
     @Override
     int hashCode() {
         nonTerminal.hashCode() + symbols.hashCode()

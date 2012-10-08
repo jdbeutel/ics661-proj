@@ -1,0 +1,25 @@
+J. David Beutel  ICS 661 assignment 4  2012-10-08
+
+I compiled and ran with Groovy 1.8.7 on Fedora 14,
+from the command line in the assignment4 directory, like so:
+
+    groovy assignment4 L1-CNF.grammar < sampleInput
+
+Other versions may also work.  The Groovy script and its dependencies
+compile automatically.  The source is assignment4.groovy, Parser.groovy,
+and (largely from assignment3) Grammar.groovy.  It will convert the
+given grammar to CNF if it is not already.
+
+The transcript of the test run on sampleInput is in the "transcript" file.
+I implemented the extra credit to show all possible parses.
+
+Also, each testing spec can be run from the command line, as shown below.
+(Change : to ; and / to \ if running on Windows.)
+I developed in IntelliJ IDEA Ultimate 11.1, which can show a diff in the
+GUI when a spec fails.  I included the IntelliJ project files in this zip,
+assignment4.iml and the contents of the .idea directory.
+
+$ groovy -version
+Groovy Version: 1.8.7 JVM: 1.6.0_20 Vendor: Sun Microsystems Inc. OS: Linux
+$ groovy -cp "lib/junit-4.9.jar:lib/spock-core-0.6-groovy-1.8.jar" ParserSpec
+JUnit 4 Runner, Tests: 11, Failures: 0, Time: 699
