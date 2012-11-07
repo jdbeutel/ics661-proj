@@ -26,11 +26,13 @@ class Grammar {
      * @param i     optional index to insert in rules list, defaults to end
      */
     private void addRule(String line, int i = rules.size()) {
-        def r = new Rule(line, this)
-        if (rules.contains(r)) {
-            throw new IllegalArgumentException("duplicate rule $line")
+        def newRules = Rule.valuesOf(line, this)
+        for (r in newRules) {
+            if (rules.contains(r)) {
+                throw new IllegalArgumentException("duplicate rule $r")
+            }
+            rules.add(i++, r)
         }
-        rules.add(i, r)
     }
 
     /**
@@ -103,7 +105,7 @@ class Grammar {
                 String terminal
                 while (terminal = r.symbols.find {it in terminals}) {
                     def dummy = nextDummySymbol
-                    addRule("$dummy -> $terminal", ++i)     // skip on next loop
+                    addRule("$dummy -> $terminal [1.0]", ++i)     // skip on next loop
                     rules.findAll {it.symbols.size() > 1}.each {it.changeSymbols(terminal, dummy)}
                 }
             }
@@ -123,7 +125,8 @@ class Grammar {
             int i = rules.indexOf(r)
             rules.remove(i)
             for (q in rulesFor(redundant)) {
-                addRule("${r.nonTerminal} -> ${q.symbols.join(' ')}", i++)
+                def p = r.attachment.probability * q.attachment.probability
+                addRule("${r.nonTerminal} -> ${q.symbols.join(' ')} [$p]", i++)
             }
         }
     }
@@ -153,7 +156,7 @@ class Grammar {
                         lastIndex = j   // to put X2 after the last pair, like the book does
                     }
                 }
-                addRule("$dummy -> ${leadPair[0]} ${leadPair[1]}", lastIndex+1)
+                addRule("$dummy -> ${leadPair[0]} ${leadPair[1]} [1.0]", lastIndex+1)
                 i-- // check current rule again
             }
         }
@@ -254,17 +257,19 @@ public class Rule {
 
     String nonTerminal
     List<String> symbols
+    Attachment attachment
     Grammar grammar
 
     /**
-     * Constructs a Rule from a line of a context-free grammar definition.
-     * This Rule does not add itself to its Grammar; the caller needs to do that,
-     * because it may have a specific place where it wants this Rule to appear in the Grammar.
+     * Constructs one or more Rule from a line of a context-free grammar definition with attachments.
+     * The rules are not added to the Grammar; the caller needs to do that,
+     * because it may have a specific place where it wants them to appear.
      *
-     * @param line the single rule to parse, containing ' -> ' separator
-     * @param g the Grammar that will contain this Rule, determining whether or not a given symbol is a terminal
+     * @param line the single rule to parse, containing ' -> ' separator, optional ' | ' separators, and '[]' attachment
+     * @param g the Grammar that will contain these Rules, determining whether or not a given symbol is a terminal
+     * @return the rules represented by the given line
      */
-    Rule(String line, Grammar g) {
+    static List<Rule> valuesOf(String line, Grammar g) {
         def parts = line.split(' -> ')
         if (parts.size() < 2) {
             throw new IllegalArgumentException("missing -> separator: $line")
@@ -272,16 +277,36 @@ public class Rule {
         if (parts.size() > 2) {
             throw new IllegalArgumentException("extra -> separators: $line")
         }
-        nonTerminal = parts[0].trim()
-        symbols = parts[1].tokenize()
+        def nonTerminal = parts[0].trim()
+        def groups = parts[1].split(/ \| /)
 
         if (!nonTerminal) {
             throw new IllegalArgumentException("missing non-terminal to the left of -> separator: $line")
         }
-        if (!symbols) {
-            throw new IllegalArgumentException("missing symbol(s) to the right of -> separator: $line")
+        def rules = []
+        for (i in 0..groups.size()-1) {
+            def group = groups[i].trim()
+            def description = "| group $i to the right of -> separator: $line"
+            def attIdx = group.indexOf('[')
+            if (attIdx == -1) {
+                throw new IllegalArgumentException("missing attachment start [ in $description")
+            }
+            if (!group.endsWith(']')) {
+                throw new IllegalArgumentException("missing attachment end ] in $description")
+            }
+            def symbols = group.substring(0, attIdx).tokenize()
+            if (!symbols) {
+                throw new IllegalArgumentException("missing symbol(s) in $description")
+            }
+            def attachment
+            try {
+                attachment = new Attachment(group.substring(attIdx+1, group.length()-1))
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("bad attachment in $description", e)
+            }
+            rules << new Rule(nonTerminal: nonTerminal, symbols: symbols, attachment: attachment, grammar: g)
         }
-        grammar = g
+        rules
     }
 
     /**
@@ -348,6 +373,43 @@ public class Rule {
      */
     @Override
     String toString() {
-        "$nonTerminal -> ${symbols.join(' ')}"
+        "$nonTerminal -> ${symbols.join(' ')} [$attachment]"
+    }
+}
+
+/**
+ * Data attached to a Rule.
+ */
+class Attachment {
+    BigDecimal probability
+
+    Attachment(String content) {
+        try {
+            probability = new BigDecimal(content)
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("could not parse probability $content", e)
+        }
+    }
+
+    /**
+     * @return a minimal String representation of the probability
+     */
+    String canonicalProbability() {
+        def s = probability as String
+        if (s.endsWith('.0')) {
+            s = s[0..-3]
+        }
+        if (s.startsWith('0.') && s.length() > 2) {
+            s = s[1..-1]
+        }
+        s
+    }
+
+    /**
+     * @return the definition of this Attachment in a format suitable for creation.
+     */
+    @Override
+    String toString() {
+        canonicalProbability()
     }
 }
