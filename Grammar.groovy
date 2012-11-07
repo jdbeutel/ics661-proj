@@ -1,5 +1,5 @@
 /**
- * A context-free grammar.
+ * A context-free grammar with probability attachments.
  * This class is not thread-safe.
  */
 class Grammar {
@@ -16,6 +16,16 @@ class Grammar {
     Grammar(String definition) {
         for (line in definition.split('\n')) {
             addRule(line)
+        }
+        validateAttachments()
+    }
+
+    private void validateAttachments() {
+        for (s in nonTerminals) {
+            def total = rulesFor(s).attachment.probability.sum()
+            if (total != 1) {
+                throw new IllegalStateException("total probability of rules for $s is $total instead of 1")
+            }
         }
     }
 
@@ -88,6 +98,7 @@ class Grammar {
         removeRulesThatAreUnreachableFromStartSymbol()
 
         rules.each {assert it.normalForm}
+        validateAttachments()
     }
 
     /**
