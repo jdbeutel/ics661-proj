@@ -1,5 +1,8 @@
 /**
- * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar.
+ * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar, with probability.
+ * Instead of optimizing the parse by limiting it to the rule with the highest probability
+ * for any given non-terminal, this generates all possible parses (like without probability)
+ * and then sorts by probability, for the sake of debugging.
  */
 class Parser {
 
@@ -53,8 +56,9 @@ class Parser {
      * @return a list of roots of all accepted, full parse trees, or the empty list if none are accepted
      */
     List<Parse> getCompletedParses() {
-        def fullParses = table[0][words.size()]                             // all A for [0,N]
-        fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}     // all S for [0,N]
+        def fullParses = table[0][words.size()]                                         // all A for [0,N]
+        def sParses = fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}   // all S for [0,N]
+        sParses.sort {-it.probability}      // most-probable first
     }
 
     /**
@@ -76,7 +80,7 @@ class Parser {
         def s = ''
         for (j in 1..table.size()) {
             for (i in 0..table.size()-j) {
-                s += "table[$i][${i+j}] = ${table[i][i+j]}\n"
+                s += "table[$i][${i+j}] = ${table[i][i+j].sort {-it.probability}}\n"
             }
         }
         s
@@ -114,16 +118,22 @@ class Parse {
         C = c
     }
 
+    BigDecimal getProbability() {
+        def p = rule.attachment.probability
+        rule.terminalForm ? p : p * B.probability * C.probability
+    }
+
     /**
      * @return render of the subtree rooted at this node (recursively) in bracket format
      */
     @Override
     String toString() {
+        def p = Attachment.canonicalProbability(probability)
         if (rule.terminalForm) {
             assert !B && !C
-            "[${rule.nonTerminal} ${rule.symbols[0]}]"
+            "[${rule.nonTerminal} ${rule.symbols[0]}][$p]"
         } else {
-            "[${rule.nonTerminal} $B $C]"
+            "[${rule.nonTerminal} $B $C][$p]"
         }
     }
 }

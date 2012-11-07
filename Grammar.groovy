@@ -405,8 +405,8 @@ class Attachment {
     /**
      * @return a minimal String representation of the probability
      */
-    String canonicalProbability() {
-        def s = probability as String
+    static String canonicalProbability(p) {
+        def s = p as String
         if (s.endsWith('.0')) {
             s = s[0..-3]
         }
@@ -421,6 +421,6 @@ class Attachment {
      */
     @Override
     String toString() {
-        canonicalProbability()
+        canonicalProbability(probability)
     }
 }
