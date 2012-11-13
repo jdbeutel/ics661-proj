@@ -28,7 +28,7 @@ class GrammarSpec extends Specification {
     }
 
     // works around Spock (or JUnit?) problems with having both \n and . in test names
-    private static String backslashToNewline(String s) {
+    static String backslashToNewline(String s) {
         s.replaceAll('\\\\', '\n')
     }
 

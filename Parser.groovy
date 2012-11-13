@@ -131,9 +131,9 @@ class Parse {
         def p = Attachment.canonicalProbability(probability)
         if (rule.terminalForm) {
             assert !B && !C
-            "[${rule.nonTerminal} ${rule.symbols[0]}][$p]"
+            "[${rule.nonTerminal} ${rule.symbols[0]} {$p}]"
         } else {
-            "[${rule.nonTerminal} $B $C][$p]"
+            "[${rule.nonTerminal} $B $C {$p}]"
         }
     }
 }

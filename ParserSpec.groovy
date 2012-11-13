@@ -16,21 +16,72 @@ class ParserSpec extends Specification {
         def p = new Parser(input, g)
 
         then:
-        p.completedParsesString == expected
+        prettyPrint(p.completedParsesString) == prettyPrint(expected)
 
         where:
         input                               || expected
-        'book'                              || '[S book][.005250]'
-        'book that flight'                  || '[S [Verb book][.30] [NP [Det that][.10] [Nominal flight][.1875]][.00375000]][.00001125000000]'
-        'book that flight through Houston'  || '[S [Verb book] [NP [Det that] [Nominal [Nominal flight] [PP [Preposition through] [NP Houston]]]]];[S [VP [Verb book] [NP [Det that] [Nominal flight]]] [PP [Preposition through] [NP Houston]]];[S [X2 [Verb book] [NP [Det that] [Nominal flight]]] [PP [Preposition through] [NP Houston]]]'
-        'does this flight include a meal'   || '[S [X1 [Aux does] [NP [Det this] [Nominal flight]]] [VP [Verb include] [NP [Det a] [Nominal meal]]]]'
-        'I prefer TWA'                      || '[S [NP I] [VP [Verb prefer] [NP TWA]]]'
-        'I prefer a flight to Houston'      || '[S [NP I] [VP [Verb prefer] [NP [Det a] [Nominal [Nominal flight] [PP [Preposition to] [NP Houston]]]]]];[S [NP I] [VP [VP [Verb prefer] [NP [Det a] [Nominal flight]]] [PP [Preposition to] [NP Houston]]]];[S [NP I] [VP [X2 [Verb prefer] [NP [Det a] [Nominal flight]]] [PP [Preposition to] [NP Houston]]]]'
-        'book the flight'                   || 'not S'  // 'the' is missing from the lexicon (not a Det)
-        'does this flight include a dinner' || 'not S'  // 'dinner' is missing from the lexicon (not a Nominal)
-        'book flight'                       || 'not S'  // missing rule
+        'book'                              || '[S book {.005250}]'
+        'book that flight'                  || '[S [Verb book {.30}] [NP [Det that {.10}] [Nominal flight {.1875}] {.00375000}] {.00001125000000}]'
+        'book that flight through Houston'  || '[S [X2 [Verb book {.30}] [NP [Det that {.10}] [Nominal flight {.1875}] {.00375000}] {.00112500000}] [PP [Preposition through {.05}] [NP Houston {.1800}] {.009000}] {5.0625000000000E-8}];[S [VP [Verb book {.30}] [NP [Det that {.10}] [Nominal flight {.1875}] {.00375000}] {.000225000000}] [PP [Preposition through {.05}] [NP Houston {.1800}] {.009000}] {1.51875000000000E-8}];[S [Verb book {.30}] [NP [Det that {.10}] [Nominal [Nominal flight {.1875}] [PP [Preposition through {.05}] [NP Houston {.1800}] {.009000}] {.000084375000}] {.0000016875000000}] {5.0625000000000E-9}]'
+        'does this flight include a meal'   || '[S [X1 [Aux does {.60}] [NP [Det this {.05}] [Nominal flight {.1875}] {.00187500}] {.00112500000}] [VP [Verb include {.30}] [NP [Det a {.25}] [Nominal meal {.1125}] {.00562500}] {.000337500000}] {5.69531250000000000E-8}]'
+        'I prefer NWA'                      || '[S [NP I {.1400}] [VP [Verb prefer {.40}] [NP NWA {.1200}] {.00960000}] {.00107520000000}]'
+        'I prefer a flight to Houston'      || '[S [NP I {.1400}] [VP [X2 [Verb prefer {.40}] [NP [Det a {.25}] [Nominal flight {.1875}] {.00937500}] {.00375000000}] [PP [Preposition to {.30}] [NP Houston {.1800}] {.054000}] {.0000202500000000000}] {.0000022680000000000000000}];[S [NP I {.1400}] [VP [VP [Verb prefer {.40}] [NP [Det a {.25}] [Nominal flight {.1875}] {.00937500}] {.000750000000}] [PP [Preposition to {.30}] [NP Houston {.1800}] {.054000}] {.00000607500000000000}] {6.8040000000000000000E-7}];[S [NP I {.1400}] [VP [Verb prefer {.40}] [NP [Det a {.25}] [Nominal [Nominal flight {.1875}] [PP [Preposition to {.30}] [NP Houston {.1800}] {.054000}] {.000506250000}] {.0000253125000000}] {.00000202500000000000}] {2.2680000000000000000E-7}]'
+        'book the flight'                   || '[S [Verb book {.30}] [NP [Det the {.60}] [Nominal flight {.1875}] {.02250000}] {.00006750000000}]'
+        'book flight'                       || '[S [Verb book {.30}] [NP flight {.028125}] {.000084375000}]'
         'book flight that'                  || 'not S'  // missing rule
-        'book book'                         || 'not S'  // missing rule
+        'book the prefer'                   || 'not S'  // missing rule
+        'flight flight'                     || 'not S'  // missing rule
+        'book those flights'                || 'not S'  // 'those' is missing from the lexicon (not a Det)
+        'does this flight include a lunch'  || 'not S'  // 'lunch' is missing from the lexicon (not a Nominal)
+    }
+
+    @Unroll
+    def 'input "#input" prettyPrints to #expected'() {
+
+        expect:
+        prettyPrint(input) == GrammarSpec.backslashToNewline(expected)
+
+        where:
+        input                                       || expected
+        '[S book {.123}]'                           || '[S book {.123}]'
+        '[S [NP I {.123}] [VP [Verb prefer {.123}] [NP NWA {.123}] {.123}] {.123}]'     || '[S \\    [NP I {.123}] \\    [VP \\        [Verb prefer {.123}] \\        [NP NWA {.123}]\\     {.123}]\\ {.123}]'
+        '[S book {.123}];[S chair {.123}]'          || '[S book {.123}]\\;\\[S chair {.123}]'
+    }
+
+    private static String prettyPrint(String s) {
+        def result = ''
+        def level = -1
+        while (s) {
+            char c = s[0]
+            s = s.substring(1)
+            switch (c) {
+                case '[':
+                    level++
+                    if (level) {
+                        result += '\n' + ' ' * (level*4)
+                    }
+                    result += '['
+                    break
+                case ']':
+                    level--
+                    result += ']'
+                    if (s.startsWith(' {')) {
+                        result += '\n' + ' ' * (level*4)
+                    }
+                    break
+                case ';':
+                    if (level == -1) {
+                        result += '\n;\n'
+                    } else {
+                        result += ';'
+                    }
+                    break
+                default:
+                    result += c
+                    break
+            }
+        }
+        result
     }
 
     static final L1_DEF = """S -> NP VP     [.80]
