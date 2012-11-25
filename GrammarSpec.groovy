@@ -63,6 +63,37 @@ class GrammarSpec extends Specification {
         'S -> a b c [1]'                                                        || 'S -> X4 X3 [1]\\X4 -> X1 X2 [1]\\X1 -> a [1]\\X2 -> b [1]\\X3 -> c [1]'
     }
 
+    @Unroll
+    def 'grammar without attachments "#description" normalizes to "#expected"'() {
+
+        given:
+        def g = new Grammar(backslashToNewline(description))
+
+        when:
+        g.normalize()
+
+        then:
+        g.toString() == backslashToNewline(expected)
+
+        where:
+        description                                 || expected
+
+        // converting terminals to non-terminals
+        'S -> a B\\B -> C d\\C -> e f'  || 'S -> X1 B\\X1 -> a\\B -> C X2\\X2 -> d\\C -> X3 X4\\X3 -> e\\X4 -> f'
+        'S -> a b'                      || 'S -> X1 X2\\X1 -> a\\X2 -> b'
+        'S -> A a\\A -> a'              || 'S -> A X1\\X1 -> a\\A -> a'   // A -> X1 undone by unit productions
+
+        // converting unit productions
+        'S -> VP\\VP -> Verb\\Verb -> book\\Verb -> include\\Verb -> prefer'    || 'S -> book\\S -> include\\S -> prefer'
+        'S -> VP Verb\\VP -> Verb\\Verb -> book\\Verb -> fly'                   || 'S -> VP Verb\\VP -> book\\VP -> fly\\Verb -> book\\Verb -> fly'
+
+        // making all rules binary
+        'S -> A B C\\A -> a\\B -> b\\C -> c'                || 'S -> X1 C\\X1 -> A B\\A -> a\\B -> b\\C -> c'
+        'S -> A B C D\\A -> a\\B -> b\\C -> c\\D -> d'      || 'S -> X2 D\\X2 -> X1 C\\X1 -> A B\\A -> a\\B -> b\\C -> c\\D -> d'
+        'S -> A B C\\A -> A B C\\A -> a\\B -> b\\C -> c'    || 'S -> X1 C\\A -> X1 C\\X1 -> A B\\A -> a\\B -> b\\C -> c'
+        'S -> a b c'                                        || 'S -> X4 X3\\X4 -> X1 X2\\X1 -> a\\X2 -> b\\X3 -> c'
+    }
+
     def "assignment 3 requirement"() {
 
         given:

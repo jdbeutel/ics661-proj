@@ -1,5 +1,5 @@
 /**
- * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar, with probability.
+ * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar, with optional probability.
  * Instead of optimizing the parse by limiting it to the rule with the highest probability
  * for any given non-terminal, this generates all possible parses (like without probability)
  * and then sorts by probability, for the sake of debugging.
@@ -58,7 +58,10 @@ class Parser {
     List<Parse> getCompletedParses() {
         def fullParses = table[0][words.size()]                                         // all A for [0,N]
         def sParses = fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}   // all S for [0,N]
-        sParses.sort {-it.probability}      // most-probable first
+        if (grammar.hasAttachments()) {
+            sParses = sParses.sort {-it.probability}      // most-probable first
+        }
+        sParses
     }
 
     /**
@@ -80,7 +83,11 @@ class Parser {
         def s = ''
         for (j in 1..table.size()) {
             for (i in 0..table.size()-j) {
-                s += "table[$i][${i+j}] = ${table[i][i+j].sort {-it.probability}}\n"
+                def parses = table[i][i+j]
+                if (grammar.hasAttachments()) {
+                    parses = parses.sort {-it.probability}
+                }
+                s += "table[$i][${i+j}] = $parses\n"
             }
         }
         s
@@ -119,8 +126,8 @@ class Parse {
     }
 
     BigDecimal getProbability() {
-        def p = rule.attachment.probability
-        rule.terminalForm ? p : p * B.probability * C.probability
+        def p = rule.probability
+        p == null || rule.terminalForm ? p : p * B.probability * C.probability
     }
 
     /**
@@ -128,12 +135,15 @@ class Parse {
      */
     @Override
     String toString() {
-        def p = Attachment.canonicalProbability(probability)
+        def attach = ''
+        if (rule.attachment) {
+            attach = " {${Attachment.canonicalProbability(probability)}}"
+        }
         if (rule.terminalForm) {
             assert !B && !C
-            "[${rule.nonTerminal} ${rule.symbols[0]} {$p}]"
+            "[${rule.nonTerminal} ${rule.symbols[0]}$attach]"
         } else {
-            "[${rule.nonTerminal} $B $C {$p}]"
+            "[${rule.nonTerminal} $B $C$attach]"
         }
     }
 }

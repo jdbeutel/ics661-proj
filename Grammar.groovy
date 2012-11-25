@@ -1,5 +1,5 @@
 /**
- * A context-free grammar with probability attachments.
+ * A context-free grammar with optional probability attachments.
  * This class is not thread-safe.
  */
 class Grammar {
@@ -21,12 +21,18 @@ class Grammar {
     }
 
     private void validateAttachments() {
-        for (s in nonTerminals) {
-            def total = rulesFor(s).attachment.probability.sum()
-            if (total != 1) {
-                throw new IllegalStateException("total probability of rules for $s is $total instead of 1")
+        if (hasAttachments()) {
+            for (s in nonTerminals) {
+                def total = rulesFor(s).probability.sum()
+                if (total != 1) {
+                    throw new IllegalStateException("total probability of rules for $s is $total instead of 1")
+                }
             }
         }
+    }
+
+    boolean hasAttachments() {
+        rules.find {it.attachment} as boolean
     }
 
     /**
@@ -116,7 +122,8 @@ class Grammar {
                 String terminal
                 while (terminal = r.symbols.find {it in terminals}) {
                     def dummy = nextDummySymbol
-                    addRule("$dummy -> $terminal [1.0]", ++i)     // skip on next loop
+                    def attach = hasAttachments() ? '[1.0]' : ''
+                    addRule("$dummy -> $terminal $attach", ++i)     // skip on next loop
                     rules.findAll {it.symbols.size() > 1}.each {it.changeSymbols(terminal, dummy)}
                 }
             }
@@ -136,8 +143,12 @@ class Grammar {
             int i = rules.indexOf(r)
             rules.remove(i)
             for (q in rulesFor(redundant)) {
-                def p = r.attachment.probability * q.attachment.probability
-                addRule("${r.nonTerminal} -> ${q.symbols.join(' ')} [$p]", i++)
+                def attach = ''
+                if (hasAttachments()) {
+                    def p = r.probability * q.probability
+                    attach = "[$p]"
+                }
+                addRule("${r.nonTerminal} -> ${q.symbols.join(' ')} $attach", i++)
             }
         }
     }
@@ -167,7 +178,8 @@ class Grammar {
                         lastIndex = j   // to put X2 after the last pair, like the book does
                     }
                 }
-                addRule("$dummy -> ${leadPair[0]} ${leadPair[1]} [1.0]", lastIndex+1)
+                def attach = hasAttachments() ? '[1.0]' : ''
+                addRule("$dummy -> ${leadPair[0]} ${leadPair[1]} $attach", lastIndex+1)
                 i-- // check current rule again
             }
         }
@@ -272,11 +284,11 @@ public class Rule {
     Grammar grammar
 
     /**
-     * Constructs one or more Rule from a line of a context-free grammar definition with attachments.
+     * Constructs one or more Rule from a line of a context-free grammar definition with optional attachments.
      * The rules are not added to the Grammar; the caller needs to do that,
      * because it may have a specific place where it wants them to appear.
      *
-     * @param line the single rule to parse, containing ' -> ' separator, optional ' | ' separators, and '[]' attachment
+     * @param line the single rule to parse, containing ' -> ' separator, and optional ' | ' separators and '[]' attachment
      * @param g the Grammar that will contain these Rules, determining whether or not a given symbol is a terminal
      * @return the rules represented by the given line
      */
@@ -298,22 +310,22 @@ public class Rule {
         for (i in 0..groups.size()-1) {
             def group = groups[i].trim()
             def description = "| group $i to the right of -> separator: $line"
+            def hasAttachment = group.contains('[')
             def attIdx = group.indexOf('[')
-            if (attIdx == -1) {
-                throw new IllegalArgumentException("missing attachment start [ in $description")
-            }
-            if (!group.endsWith(']')) {
-                throw new IllegalArgumentException("missing attachment end ] in $description")
-            }
-            def symbols = group.substring(0, attIdx).tokenize()
+            def symbols = group.substring(0, hasAttachment ? attIdx : group.length()).tokenize()
             if (!symbols) {
                 throw new IllegalArgumentException("missing symbol(s) in $description")
             }
-            def attachment
-            try {
-                attachment = new Attachment(group.substring(attIdx+1, group.length()-1))
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("bad attachment in $description", e)
+            def attachment = null
+            if (hasAttachment) {
+                if (!group.endsWith(']')) {
+                    throw new IllegalArgumentException("missing attachment end ] in $description")
+                }
+                try {
+                    attachment = new Attachment(group.substring(attIdx+1, group.length()-1))
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("bad attachment in $description", e)
+                }
             }
             rules << new Rule(nonTerminal: nonTerminal, symbols: symbols, attachment: attachment, grammar: g)
         }
@@ -367,6 +379,10 @@ public class Rule {
         }
     }
 
+    BigDecimal getProbability() {
+        attachment?.probability
+    }
+
     // for convenient duplicate check in List
     @Override
     boolean equals(Object other) {
@@ -384,7 +400,7 @@ public class Rule {
      */
     @Override
     String toString() {
-        "$nonTerminal -> ${symbols.join(' ')} [$attachment]"
+        "$nonTerminal -> ${symbols.join(' ')}" + (attachment ? " [$attachment]" : '')
     }
 }
 
