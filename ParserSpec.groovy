@@ -1,6 +1,8 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static Parser.prettyPrint
+
 /**
  * Test specification of Parser.
  */
@@ -46,42 +48,6 @@ class ParserSpec extends Specification {
         '[S book {.123}]'                           || '[S book {.123}]'
         '[S [NP I {.123}] [VP [Verb prefer {.123}] [NP NWA {.123}] {.123}] {.123}]'     || '[S \\    [NP I {.123}] \\    [VP \\        [Verb prefer {.123}] \\        [NP NWA {.123}]\\     {.123}]\\ {.123}]'
         '[S book {.123}];[S chair {.123}]'          || '[S book {.123}]\\;\\[S chair {.123}]'
-    }
-
-    private static String prettyPrint(String s) {
-        def result = ''
-        def level = -1
-        while (s) {
-            char c = s[0]
-            s = s.substring(1)
-            switch (c) {
-                case '[':
-                    level++
-                    if (level) {
-                        result += '\n' + ' ' * (level*4)
-                    }
-                    result += '['
-                    break
-                case ']':
-                    level--
-                    result += ']'
-                    if (s.startsWith(' {')) {
-                        result += '\n' + ' ' * (level*4)
-                    }
-                    break
-                case ';':
-                    if (level == -1) {
-                        result += '\n;\n'
-                    } else {
-                        result += ';'
-                    }
-                    break
-                default:
-                    result += c
-                    break
-            }
-        }
-        result
     }
 
     static final L1_DEF = """S -> NP VP     [.80]

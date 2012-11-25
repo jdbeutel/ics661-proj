@@ -1,3 +1,5 @@
+import java.util.regex.Pattern
+
 /**
  * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar, with optional probability.
  * Instead of optimizing the parse by limiting it to the rule with the highest probability
@@ -15,11 +17,12 @@ class Parser {
      *
      * @param line the line of words to parse (i.e., a sentence)
      * @param g the grammar to use for the parse
+     * @param lexer (optional) a regex identifying each separate word (i.e., token) in the line
      */
-    Parser(String line, Grammar g) {
+    Parser(String line, Grammar g, Pattern lexer = ~/\w+/) {
         g.normalize()     // CKY requires CNF, so just in case g is not already
         grammar = g
-        words = line.tokenize()
+        words = lexer.matcher(line).collect {it}
         parse()
     }
 
@@ -91,6 +94,48 @@ class Parser {
             }
         }
         s
+    }
+
+    /**
+     * Renders a completedParsesString in an easily readable and comparable format, for testing.
+     *
+     * @param s a completedParsesString
+     * @return the given parse formatted on multiple lines with indents
+     */
+    static String prettyPrint(String s) {
+        def result = ''
+        def level = -1
+        while (s) {
+            char c = s[0]
+            s = s.substring(1)
+            switch (c) {
+                case '[':
+                    level++
+                    if (level) {
+                        result += '\n' + ' ' * (level*4)
+                    }
+                    result += '['
+                    break
+                case ']':
+                    level--
+                    result += ']'
+                    if (s.startsWith(' {')) {
+                        result += '\n' + ' ' * (level*4)
+                    }
+                    break
+                case ';':
+                    if (level == -1) {
+                        result += '\n;\n'
+                    } else {
+                        result += ';'
+                    }
+                    break
+                default:
+                    result += c
+                    break
+            }
+        }
+        result
     }
 }
 

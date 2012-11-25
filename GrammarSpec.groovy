@@ -106,6 +106,26 @@ class GrammarSpec extends Specification {
         g.toString() == L1_CNF
     }
 
+    def "normalization is stable"() {
+
+        given:
+        def g = new Grammar(input)
+
+        when:
+        g.normalize()
+        def firstNormal = g.toString()
+
+        and: 'again'
+        g.normalize()
+        def secondNormal = g.toString()
+
+        then:
+        firstNormal == secondNormal
+
+        where:
+        input << [L1_DEF, L1_CNF]
+    }
+
     def "normalization is reflexive"() {
 
         given:
@@ -116,6 +136,38 @@ class GrammarSpec extends Specification {
 
         then:
         g.toString() == L1_CNF
+    }
+
+    def 'split does not work the way Grammar would need it to'() {
+
+        expect:
+        'abc'.split(/\b/) == ['', 'abc']
+        'a c'.split(/\b/) == ['', 'a', ' ', 'c']
+        'a.c'.split(/\b/) == ['', 'a', '.', 'c']
+        'λx.x'.split(/\b/) == ['', 'λx', '.', 'x']
+        'a,b'.split(/\b/) == ['', 'a', ',', 'b']
+        'a, b'.split(/\b/) == ['', 'a', ', ', 'b']
+        'a) ∧ ¬b'.split(/\b/) == ['', 'a', ') ∧ ¬', 'b']
+    }
+
+    @Unroll
+    def '#pattern matches "#input" as #expected'() {
+
+        expect:
+        pattern.matcher(input).collect {it} == expected
+
+        where:
+        input       | pattern       | expected
+        'abc'       | ~/\w+/        | ['abc']
+        'a c'       | ~/\w+/        | ['a', 'c']
+        'λx.x'      | ~/\w+/        | ['x', 'x']     // not sure why λ is not in \w, but don't want it there anyway
+        'λx.x'      | ~/[λ.]|\w+/   | ['λ', 'x', '.', 'x']
+        'a,b'       | ~/\w+/        | ['a', 'b']
+        'a,b'       | ~/[,]|\w+/    | ['a', ',', 'b']
+        'a, b'      | ~/\w+/        | ['a', 'b']
+        'a, b'      | ~/[,]|\w+/    | ['a', ',', 'b']
+        'a) ∧ ¬b'   | ~/\w+/        | ['a', 'b']
+        'a) ∧ ¬b'   | ~/[)∧¬]|\w+/  | ['a', ')', '∧', '¬', 'b']
     }
 
     static final L1_DEF = """S -> NP VP     [.80]
