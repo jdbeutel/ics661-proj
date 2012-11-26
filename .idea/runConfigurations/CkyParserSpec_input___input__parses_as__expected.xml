@@ -1,10 +1,10 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="ParserSpec.input &quot;#input&quot; parses as #expected" type="JUnit" factoryName="JUnit">
+  <configuration default="false" name="CkyParserSpec.input &quot;#input&quot; parses as #expected" type="JUnit" factoryName="JUnit">
     <module name="ics661proj" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" value="" />
     <option name="PACKAGE_NAME" value="" />
-    <option name="MAIN_CLASS_NAME" value="ParserSpec" />
+    <option name="MAIN_CLASS_NAME" value="CkyParserSpec" />
     <option name="METHOD_NAME" value="input &quot;#input&quot; parses as #expected" />
     <option name="TEST_OBJECT" value="method" />
     <option name="VM_PARAMETERS" value="-ea" />

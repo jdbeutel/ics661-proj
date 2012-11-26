@@ -1,12 +1,12 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static Parser.prettyPrint
+import static CkyParser.prettyPrint
 
 /**
- * Test specification of Parser.
+ * Test specification of CkyParser.
  */
-class ParserSpec extends Specification {
+class CkyParserSpec extends Specification {
 
     @Unroll
     def 'input "#input" parses as #expected'() {
@@ -15,7 +15,7 @@ class ParserSpec extends Specification {
         def g = new Grammar(L1_DEF)
 
         when:
-        def p = new Parser(input, g)
+        def p = new CkyParser(input, g)
 
         then:
         prettyPrint(p.completedParsesString) == prettyPrint(expected)

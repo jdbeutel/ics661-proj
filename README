@@ -6,7 +6,7 @@ from the command line in the assignment4 directory, like so:
     groovy assignment4 L1-CNF.grammar < sampleInput
 
 Other versions may also work.  The Groovy script and its dependencies
-compile automatically.  The source is assignment4.groovy, Parser.groovy,
+compile automatically.  The source is assignment4.groovy, CkyParser.groovy,
 and (largely from assignment3) Grammar.groovy.  It will convert the
 given grammar to CNF if it is not already.
 
@@ -21,5 +21,5 @@ assignment4.iml and the contents of the .idea directory.
 
 $ groovy -version
 Groovy Version: 1.8.7 JVM: 1.6.0_20 Vendor: Sun Microsystems Inc. OS: Linux
-$ groovy -cp "lib/junit-4.9.jar:lib/spock-core-0.6-groovy-1.8.jar" ParserSpec
+$ groovy -cp "lib/junit-4.9.jar:lib/spock-core-0.6-groovy-1.8.jar" CkyParserSpec
 JUnit 4 Runner, Tests: 11, Failures: 0, Time: 699

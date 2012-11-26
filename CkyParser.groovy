@@ -6,20 +6,20 @@ import java.util.regex.Pattern
  * for any given non-terminal, this generates all possible parses (like without probability)
  * and then sorts by probability, for the sake of debugging.
  */
-class Parser {
+class CkyParser {
 
     List<String> words
     Grammar grammar
-    List<List<List<Parse>>> table = [].withDefault {[].withDefault {[]}}
+    List<List<List<CkyParse>>> table = [].withDefault {[].withDefault {[]}}
 
     /**
-     * Constructs a Parser, parsing the given line with the given Grammar.
+     * Constructs a CkyParser, parsing the given line with the given Grammar.
      *
      * @param line the line of words to parse (i.e., a sentence)
      * @param g the grammar to use for the parse
      * @param lexer (optional) a regex identifying each separate word (i.e., token) in the line
      */
-    Parser(String line, Grammar g, Pattern lexer = ~/\w+/) {
+    CkyParser(String line, Grammar g, Pattern lexer = ~/\w+/) {
         g.normalize()     // CKY requires CNF, so just in case g is not already
         grammar = g
         words = lexer.matcher(line).collect {it}
@@ -37,7 +37,7 @@ class Parser {
             // The cell on the diagonal gets all terminal lexicon parses (A -> word) for this word.
             String word = words[j-1]    // j-1 adjusts the algorithm to the 0-based list
             List<Rule> lexicon = grammar.lexiconOf(word)
-            List<Parse> lexiconParses = lexicon.collect {new Parse(it)}
+            List<CkyParse> lexiconParses = lexicon.collect {new CkyParse(it)}
             table[j-1][j].addAll(lexiconParses)     // diagonal (starting from row 0 and column 1)
 
             // Each cell in this column, from above the diagonal to row 0 (i.e., table[i][j]),
@@ -47,7 +47,7 @@ class Parser {
                     for (B in table[i][k]) {        // for each B = [i,k]
                         for (C in table[k][j]) {    // for each C = [k,j]
                             def matching = grammar.rulesTo(B.rule.nonTerminal, C.rule.nonTerminal)  // all A -> B C
-                            table[i][j].addAll(matching.collect {new Parse(it, B, C)})
+                            table[i][j].addAll(matching.collect {new CkyParse(it, B, C)})
                         }
                     }
                 }
@@ -58,7 +58,7 @@ class Parser {
     /**
      * @return a list of roots of all accepted, full parse trees, or the empty list if none are accepted
      */
-    List<Parse> getCompletedParses() {
+    List<CkyParse> getCompletedParses() {
         def fullParses = table[0][words.size()]                                         // all A for [0,N]
         def sParses = fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}   // all S for [0,N]
         if (grammar.hasAttachments()) {
@@ -142,16 +142,16 @@ class Parser {
 /**
  * A node (i.e., subtree) in a CKY parse tree.
  */
-class Parse {
+class CkyParse {
     Rule rule   // A -> B C, or A -> terminal
-    Parse B, C
+    CkyParse B, C
 
     /**
      * Constructor for a terminal rule.
      *
      * @param r a Rule in terminal form
      */
-    Parse(Rule r) {
+    CkyParse(Rule r) {
         assert r.terminalForm
         rule = r
     }
@@ -163,7 +163,7 @@ class Parse {
      * @param b the left subtree node
      * @param c the right subtree node
      */
-    Parse(Rule r, Parse b, Parse c) {
+    CkyParse(Rule r, CkyParse b, CkyParse c) {
         assert r.binaryForm
         rule = r
         B = b

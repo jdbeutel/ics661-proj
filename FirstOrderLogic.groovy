@@ -11,11 +11,15 @@ class FirstOrderLogic {
     static final LAMBDA = 'λ'
 
     static final GRAMMAR = new Grammar("""S -> Formula
-        Formula -> AtomicFormula | Formula Connective Formula | Quantifier VariableList Formula | ¬ Formula | ( Formula )
-        Formula -> λ Variable . Formula
+        Formula -> LogicFormula | LambdaFormula | Quantifier VariableList Formula | ( Formula )
+        LambdaFormula -> LambdaAbstraction | LambdaApplication
+        LambdaAbstraction -> λ Variable . Formula | λ AbstractionVariable . Formula
+        LambdaApplication -> LambdaAbstraction ( TermOrFormula ) | AbstractionVariable ( TermOrFormula )
+        TermOrFormula -> Term | Formula
+        LogicFormula -> AtomicFormula | Formula Connective Formula | ¬ Formula
+        AtomicFormula -> Predicate ( TermList )
         VariableList -> Variable | Variable , VariableList
         TermList -> Term | Term , TermList
-        AtomicFormula -> Predicate ( TermList )
         Term -> Function ( TermList ) | Constant | Variable
         Connective -> ∧ | ∨ | ⇒
         Quantifier -> ∀ | ∃
@@ -25,8 +29,10 @@ class FirstOrderLogic {
         Constant -> Yesterday | Today | Tomorrow | Now
         Constant -> NewYork | Boston | SanFrancisco
         Constant -> Matthew | Franco | Frasca
-        Variable -> a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z
-        Variable -> A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R |     T | U | V | W | X | Y | Z
+        Variable -> a | b | c | d | e | f | g | h | i | j | k | l | m
+        Variable -> n | o | p | q | r | s | t | u | v | w | x | y | z
+        AbstractionVariable -> A | B | C | D | E | F | G | H | I | J | K | L | M
+        AbstractionVariable -> N | O | P | Q | R |     T | U | V | W | X | Y | Z
         Predicate -> Serves | Near | Restaurant | Have | VegetarianRestaurant
         Predicate -> Eating | Time | Eater | Eaten | Meal | Location
         Predicate -> Arriving | Arriver | Destination | EndPoint | Precedes
@@ -34,8 +40,8 @@ class FirstOrderLogic {
         Predicate -> Menu | Having | Haver | Had
         Function -> LocationOf | CuisineOf | IntervalOf | MemberOf """)
 
-    static Parser parse(String input) {
+    static CkyParser parse(String input) {
         Pattern lexer = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
-        new Parser(input, GRAMMAR, lexer)
+        new CkyParser(input, GRAMMAR, lexer)
     }
 }

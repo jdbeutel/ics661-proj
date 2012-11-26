@@ -1,7 +1,7 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static Parser.prettyPrint
+import static CkyParser.prettyPrint
 
 /**
  * Test specification of FirstOrderLogic.
@@ -53,6 +53,7 @@ class FirstOrderLogicSpec extends Specification {
         input                               || expected
         'Restaurant(Maharani)'              || '[S [X8 [X7 [Predicate Restaurant] [X2 (]] [TermList Maharani]] [X3 )]]'
         'Have(Speaker, FiveDollars) ∧ ¬Have(Speaker, LotOfTime)'    || '[S [X9 [Formula [X8 [X7 [Predicate Have] [X2 (]] [TermList [X17 [Term Speaker] [X6 ,]] [TermList FiveDollars]]] [X3 )]] [Connective ∧]] [Formula [X1 ¬] [Formula [X8 [X7 [Predicate Have] [X2 (]] [TermList [X17 [Term Speaker] [X6 ,]] [TermList LotOfTime]]] [X3 )]]]]'
+        '∀x(VegetarianRestaurant(x) ⇒ Serves(x, VegetarianFood))'   || '[S foo]'
         '∀x VegetarianRestaurant(x) ⇒ Serves(x, VegetarianFood)'    || '[S foo]'
     }
 
