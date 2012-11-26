@@ -3,13 +3,11 @@ import java.util.regex.Pattern
 /**
  * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar, with optional probability.
  * Instead of optimizing the parse by limiting it to the rule with the highest probability
- * for any given non-terminal, this generates all possible parses (like without probability)
- * and then sorts by probability, for the sake of debugging.
+ * for any given non-terminal, this generates all possible parses (even with probability),
+ * and then sorts by probability (if any), for the sake of debugging.
  */
-class CkyParser {
+class CkyParser extends Parser {
 
-    List<String> words
-    Grammar grammar
     List<List<List<CkyParse>>> table = [].withDefault {[].withDefault {[]}}
 
     /**
@@ -20,9 +18,8 @@ class CkyParser {
      * @param lexer (optional) a regex identifying each separate word (i.e., token) in the line
      */
     CkyParser(String line, Grammar g, Pattern lexer = ~/\w+/) {
+        super(line, g, lexer)
         g.normalize()     // CKY requires CNF, so just in case g is not already
-        grammar = g
-        words = lexer.matcher(line).collect {it}
         parse()
     }
 
@@ -68,15 +65,6 @@ class CkyParser {
     }
 
     /**
-     * Renders all accepted, full parses as required for assignment 4.
-     *
-     * @return a rendering of all possible parses, or "not S" if none are accepted
-     */
-    String getCompletedParsesString() {
-        completedParses?.join(';') ?: "not ${grammar.startSymbol}"
-    }
-
-    /**
      * Renders the whole parse table, for debugging.  (This is not required for assignment 4.)
      *
      * @return a rendering of the parse table along the diagonals, from the terminals to the apex
@@ -94,48 +82,6 @@ class CkyParser {
             }
         }
         s
-    }
-
-    /**
-     * Renders a completedParsesString in an easily readable and comparable format, for testing.
-     *
-     * @param s a completedParsesString
-     * @return the given parse formatted on multiple lines with indents
-     */
-    static String prettyPrint(String s) {
-        def result = ''
-        def level = -1
-        while (s) {
-            char c = s[0]
-            s = s.substring(1)
-            switch (c) {
-                case '[':
-                    level++
-                    if (level) {
-                        result += '\n' + ' ' * (level*4)
-                    }
-                    result += '['
-                    break
-                case ']':
-                    level--
-                    result += ']'
-                    if (s.startsWith(' {')) {
-                        result += '\n' + ' ' * (level*4)
-                    }
-                    break
-                case ';':
-                    if (level == -1) {
-                        result += '\n;\n'
-                    } else {
-                        result += ';'
-                    }
-                    break
-                default:
-                    result += c
-                    break
-            }
-        }
-        result
     }
 }
 
