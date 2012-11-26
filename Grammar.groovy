@@ -212,7 +212,7 @@ class Grammar {
      * @param nonTerminal   the LHS of the rules to find
      * @return  a list of rules with the given LHS
      */
-    private List<Rule> rulesFor(String nonTerminal) {
+    List<Rule> rulesFor(String nonTerminal) {
         rules.findAll {it.nonTerminal == nonTerminal}
     }
 
@@ -228,6 +228,21 @@ class Grammar {
      */
     List<Rule> lexiconOf(String terminal) {
         rules.findAll {it.terminalForm && it.symbols[0] == terminal}
+    }
+
+    /**
+     * Checks whether the given symbol is an LHS in the lexicon.
+     * This method scans all the rules, rather than maintaining
+     * a map like this throughout the class, because I would rather
+     * keep this code simple than try to optimize it.
+     *
+     *
+     * @param nonTerminal   the LHS of the rules to check
+     * @return  whether the given symbol just the LHS of rules in terminal form
+     */
+    boolean isLexicon(String nonTerminal) {
+        def matches = rulesFor(nonTerminal)
+        matches && !matches.find {!it.terminalForm}
     }
 
     /**
@@ -343,7 +358,7 @@ public class Rule {
      * @return whether this rule is in normalized binary form
      */
     boolean isBinaryForm() {
-        symbols.size() == 2 && symbols[0] in grammar.nonTerminals && symbols[1] in grammar.nonTerminals
+        symbols.size() == 2 && symbols == nonTerminalSymbols
     }
 
     /**
@@ -360,7 +375,11 @@ public class Rule {
      * @return whether this rule is a unit production
      */
     boolean isUnitProduction() {
-        symbols.size() == 1 && symbols[0] in grammar.nonTerminals
+        symbols.size() == 1 && symbols == nonTerminalSymbols
+    }
+
+    List<String> getNonTerminalSymbols() {
+        symbols.findAll {it in grammar.nonTerminals}
     }
 
     /**
