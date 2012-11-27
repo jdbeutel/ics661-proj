@@ -72,7 +72,8 @@ class EarleyParser extends Parser {
         def B = state.rule.nonTerminal
         def j = state.inputStartIdx
         def k = state.inputDotIdx
-        for (State match in chart[j].findAll {it.b == B && it.inputDotIdx == j}) {
+        def incompleteStates = chart[j].findAll {!it.complete && it != dummyStartState}
+        for (State match in incompleteStates.findAll {it.b == B && it.inputDotIdx == j}) {
             enqueue(match.completer(state), chart[k])
         }
     }
