@@ -29,7 +29,7 @@ class EarleyParser extends Parser {
         for (i in 0..words.size()) {
             int j = 0
             while (j < chart[i].size()) {   // allowing chart[i] to grow as j goes through it
-                def state = chart[i][j]
+                def state = chart[i][j++]
                 if (state.complete) {
                     completer(state)
                 } else {
@@ -39,7 +39,6 @@ class EarleyParser extends Parser {
                         predictor(state)
                     }
                 }
-                j++
             }
         }
     }
@@ -98,10 +97,15 @@ class EarleyParser extends Parser {
         sParses
     }
 
+    /**
+     * Renders the whole parse chart, for debugging.
+     *
+     * @return a flat rendering of the parse chart (i.e., not nested or treed)
+     */
     @Override
     String toString() {
         (0..<chart.size()).collect { i ->
-            "Chart[$i]\t" + chart[i].join('\n\t')
+            "Chart[$i]\t" + chart[i]*.toFlatString().join('\n\t')
         }.join('\n\n')
     }
 
@@ -145,12 +149,31 @@ class EarleyParser extends Parser {
         State completer(State component) {
             assert !complete && component.complete
             def result = new State(rule, dotIdx+1, [inputStartIdx, component.inputDotIdx], 'completer')
+            if (dotIdx > 0) {
+                result.components = components[0..<dotIdx]
+            }
             result.components[dotIdx] = component
             result
         }
 
+        /**
+         * @return render of the subtree rooted at this node (recursively) in bracket format
+         */
         @Override
         String toString() {
+            def attach = ''
+            if (rule.attachment) {
+                attach = " {${Attachment.canonicalProbability(probability)}}"
+            }
+            def subtrees = []
+            for (i in 0..<rule.symbols.size()) {
+                def s = rule.symbols[i]
+                subtrees << (i < dotIdx && s in rule.nonTerminalSymbols ? components[i] : s)
+            }
+            "[$name ${rule.nonTerminal} ${subtrees.join(' ')} ($inputStartIdx,$inputDotIdx)$attach]"
+        }
+
+        String toFlatString() {
             [name, ruleWithDot, [inputStartIdx, inputDotIdx], function].join('\t')
         }
 

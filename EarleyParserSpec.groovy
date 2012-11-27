@@ -1,17 +1,20 @@
 import spock.lang.Specification
 
+import static Parser.prettyPrint
+
 /**
  * Test specification of EarleyParser.
  */
 class EarleyParserSpec extends Specification {
 
-    def '"book that flight" parse chart as expected'() {
+    def '"book that flight" parses as expected'() {
 
         given:
         def p = new EarleyParser('book that flight', new Grammar(L1_DEF))
 
         expect:
         p.toString() == EXPECTED_CHART
+        prettyPrint(p.completedParsesString) == EXPECTED_PARSE
     }
 
     static final L1_DEF = """S -> NP VP | Aux NP VP | VP
@@ -68,4 +71,16 @@ Chart[3]\tS28\tNoun -> flight ∙\t[2, 3]\tscanner
 \tS35\tPP -> ∙ Preposition NP\t[3, 3]\tpredictor
 \tS36\tS -> VP ∙\t[0, 3]\tcompleter
 \tS37\tVP -> VP ∙ PP\t[0, 3]\tcompleter"""
+
+    static final EXPECTED_PARSE = """[S36 S
+    [S33 VP
+        [S12 Verb book (0,1)]
+        [S30 NP
+            [S23 Det that (1,2)]
+            [S29 Nominal
+                [S28 Noun flight (2,3)]
+             (2,3)]
+         (1,3)]
+     (0,3)]
+ (0,3)]"""
 }

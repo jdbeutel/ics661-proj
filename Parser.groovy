@@ -42,7 +42,7 @@ abstract class Parser {
      * @return the given parse formatted on multiple lines with indents
      */
     static String prettyPrint(String s) {
-        def result = ''
+        def result = new StringBuilder()
         def level = -1
         while (s) {
             char c = s[0]
@@ -51,29 +51,38 @@ abstract class Parser {
                 case '[':
                     level++
                     if (level) {
-                        result += '\n' + ' ' * (level*4)
+                        indent(result, level)
                     }
-                    result += '['
+                    result << '['
                     break
                 case ']':
                     level--
-                    result += ']'
-                    if (s.startsWith(' {')) {
-                        result += '\n' + ' ' * (level*4)
+                    result << ']'
+                    if (s.startsWith(' {') || s.startsWith(' (')) {
+                        indent(result, level)
                     }
                     break
                 case ';':
                     if (level == -1) {
-                        result += '\n;\n'
+                        result << '\n;\n'
                     } else {
-                        result += ';'
+                        result << ';'
                     }
                     break
                 default:
-                    result += c
+                    result << c
                     break
             }
         }
         result
+    }
+
+    private static void indent(StringBuilder sb, level) {
+        int lastCharIdx = sb.length() - 1
+        if (sb.charAt(lastCharIdx) == ' ') {
+            // delete trailing space, because IntelliJ automatically does the same thing to the spec data
+            sb.deleteCharAt(lastCharIdx)
+        }
+        sb << '\n' + ' ' * (level*4)
     }
 }

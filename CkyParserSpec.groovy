@@ -46,7 +46,7 @@ class CkyParserSpec extends Specification {
         where:
         input                                       || expected
         '[S book {.123}]'                           || '[S book {.123}]'
-        '[S [NP I {.123}] [VP [Verb prefer {.123}] [NP NWA {.123}] {.123}] {.123}]'     || '[S \\    [NP I {.123}] \\    [VP \\        [Verb prefer {.123}] \\        [NP NWA {.123}]\\     {.123}]\\ {.123}]'
+        '[S [NP I {.123}] [VP [Verb prefer {.123}] [NP NWA {.123}] {.123}] {.123}]'     || '[S\\    [NP I {.123}]\\    [VP\\        [Verb prefer {.123}]\\        [NP NWA {.123}]\\     {.123}]\\ {.123}]'
         '[S book {.123}];[S chair {.123}]'          || '[S book {.123}]\\;\\[S chair {.123}]'
     }
 
