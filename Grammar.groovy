@@ -378,8 +378,19 @@ public class Rule {
         symbols.size() == 1 && symbols == nonTerminalSymbols
     }
 
+    /**
+     * @return List of symbols of this Rule that are non-terminals.
+     * This does not include this Rule's nonTerminal property, which is obviously non-terminal.
+     */
     List<String> getNonTerminalSymbols() {
         symbols.findAll {it in grammar.nonTerminals}
+    }
+
+    /**
+     * @return List of terminal symbols of this Rule.
+     */
+    List<String> getTerminals() {
+        symbols - nonTerminalSymbols
     }
 
     /**

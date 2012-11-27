@@ -35,6 +35,8 @@ class EarleyParser extends Parser {
                 } else {
                     if (grammar.isLexicon(state.b)) {
                         scanner(state)
+                    } else if (state.b in grammar.terminals) {
+                        advancing(state)
                     } else {
                         predictor(state)
                     }
@@ -64,6 +66,13 @@ class EarleyParser extends Parser {
         if (rule) {
             assert rule.nonTerminal == B && rule.symbols == [word]
             enqueue(new State(rule, 1, [j, j+1], 'scanner'), chart[j+1])
+        }
+    }
+
+    private void advancing(State state) {
+        def j = state.inputDotIdx
+        if (words[j] == state.b) {
+            enqueue(state.advancing(), chart[j+1])
         }
     }
 
@@ -141,7 +150,7 @@ class EarleyParser extends Parser {
         }
 
         /**
-         * Factory method for a new State with the dot advanced by one component.
+         * Factory method for a new State with the dot advanced over one completed component.
          *
          * @param component completed for advance
          * @return new State
@@ -150,9 +159,26 @@ class EarleyParser extends Parser {
             assert !complete && component.complete
             def result = new State(rule, dotIdx+1, [inputStartIdx, component.inputDotIdx], 'completer')
             if (dotIdx > 0) {
-                result.components = components[0..<dotIdx]
+                result.components += components[0..<dotIdx]
             }
             result.components[dotIdx] = component
+            result
+        }
+
+        /**
+         * Factory method for a new State with the dot advanced over one terminal symbol.
+         * This is an optimization of the textbook's optimization of scanner(),
+         * to support terminal symbols in non-terminal-form rules (i.e., in lexicon, or part of speech).
+         *
+         * @return new State
+         */
+        State advancing() {
+            assert !complete && b in rule.terminals
+            def result = new State(rule, dotIdx+1, [inputStartIdx, inputDotIdx+1], 'advancing')
+            if (dotIdx > 0) {
+                result.components += components[0..<dotIdx]
+            }
+            result.components[dotIdx] = null    // just the terminal symbol here
             result
         }
 

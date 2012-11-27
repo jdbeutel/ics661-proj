@@ -40,8 +40,8 @@ class FirstOrderLogic {
         Predicate -> Menu | Having | Haver | Had
         Function -> LocationOf | CuisineOf | IntervalOf | MemberOf """)
 
-    static CkyParser parse(String input) {
+    static EarleyParser parse(String input) {
         Pattern lexer = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
-        new CkyParser(input, GRAMMAR, lexer)
+        new EarleyParser(input, GRAMMAR, lexer)
     }
 }

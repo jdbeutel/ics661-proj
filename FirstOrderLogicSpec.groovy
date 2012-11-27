@@ -1,7 +1,7 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static CkyParser.prettyPrint
+import static Parser.prettyPrint
 
 /**
  * Test specification of FirstOrderLogic.
@@ -28,15 +28,12 @@ class FirstOrderLogicSpec extends Specification {
         c.isLetter()
     }
 
-    def 'normalized FOL grammar'() {
+    def 'FOL grammar is not normalized'() {
 
         given:
         def g = FirstOrderLogic.GRAMMAR
 
-        when:
-        g.normalize()
-
-        then:
+        expect:
         g.toString() == FOL_CNF
     }
 
