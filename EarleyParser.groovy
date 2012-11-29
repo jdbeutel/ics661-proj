@@ -86,7 +86,7 @@ class EarleyParser extends Parser {
         }
     }
 
-    private static enqueueSequence = 0
+    private enqueueSequence = 0
 
     private void enqueue(State state, List<State> chartEntry) {
         if (!(state in chartEntry)) {
