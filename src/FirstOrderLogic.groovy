@@ -14,10 +14,10 @@ class FirstOrderLogic {
         Formula -> LambdaFormula | QuantifiedFormula | LogicFormula | AtomicFormula | ( Formula )
         LambdaFormula -> LambdaAbstraction | LambdaApplication
         LambdaAbstraction -> λ Variable . Formula | λ AbstractionVariable . Formula
-        LambdaApplication -> LambdaAbstraction ( TermOrFormula ) | AbstractionVariable ( TermOrFormula )
+        LambdaApplication -> LambdaAbstraction ( TermOrFormula )
         QuantifiedFormula -> Quantifier VariableList Formula
         LogicFormula -> Formula Connective Formula | ¬ Formula
-        AtomicFormula -> Predicate ( TermList )
+        AtomicFormula -> Predicate ( TermList ) | AbstractionVariable ( TermOrFormula )
         TermOrFormula -> Term | Formula
         VariableList -> Variable | Variable , VariableList
         TermList -> Term | Term , TermList
@@ -56,4 +56,31 @@ class FirstOrderLogic {
                 throw new IllegalArgumentException("ambiguous input ($count parses) $input\n $detail")
         }
     }
+}
+
+class LambdaExpression {
+    List<LambdaTerm> terms
+}
+
+class LambdaTerm {
+    Variable variable
+    String symbol                       // disregarding logic
+    LambdaAbstraction abstraction
+    LambdaApplication application
+}
+
+//LambdaAbstraction -> λ Variable . Formula | λ AbstractionVariable . Formula
+class LambdaAbstraction {
+    Variable boundVariable
+    LambdaExpression formula
+}
+
+//LambdaApplication -> LambdaAbstraction ( TermOrFormula )
+class LambdaApplication {
+    LambdaAbstraction abstraction
+    LambdaExpression formula
+}
+
+class Variable {
+    String name
 }

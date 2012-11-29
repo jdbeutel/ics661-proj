@@ -304,50 +304,46 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λP.(λQ.∀x(P(x)⇒Q(x)))(λx.Restaurant(x))')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S282 S
-    [S281 Formula
-        [S280 LambdaFormula
-            [S279 LambdaApplication
-                [S208 LambdaAbstraction λ
+        prettyPrint(p.completedParsesString) == """[S280 S
+    [S279 Formula
+        [S278 LambdaFormula
+            [S277 LambdaApplication
+                [S206 LambdaAbstraction λ
                     [S19 AbstractionVariable P (1,2)] .
-                    [S207 Formula (
-                        [S204 Formula
-                            [S202 LambdaFormula
-                                [S200 LambdaAbstraction λ
+                    [S205 Formula (
+                        [S202 Formula
+                            [S200 LambdaFormula
+                                [S198 LambdaAbstraction λ
                                     [S55 AbstractionVariable Q (5,6)] .
-                                    [S199 Formula
-                                        [S197 QuantifiedFormula
+                                    [S197 Formula
+                                        [S195 QuantifiedFormula
                                             [S73 Quantifier ∀ (7,8)]
                                             [S78 VariableList
                                                 [S77 Variable x (8,9)]
                                              (8,9)]
-                                            [S196 Formula (
-                                                [S193 Formula
-                                                    [S191 LogicFormula
-                                                        [S141 Formula
-                                                            [S140 LambdaFormula
-                                                                [S139 LambdaApplication
-                                                                    [S112 AbstractionVariable P (10,11)]
-                                                                 (
-                                                                    [S137 TermOrFormula
-                                                                        [S136 Term
-                                                                            [S125 Variable x (12,13)]
-                                                                         (12,13)]
-                                                                     (12,13)] ) (10,14)]
-                                                             (10,14)]
+                                            [S194 Formula (
+                                                [S191 Formula
+                                                    [S189 LogicFormula
+                                                        [S140 Formula
+                                                            [S139 AtomicFormula
+                                                                [S112 AbstractionVariable P (10,11)]
+                                                             (
+                                                                [S137 TermOrFormula
+                                                                    [S136 Term
+                                                                        [S125 Variable x (12,13)]
+                                                                     (12,13)]
+                                                                 (12,13)] ) (10,14)]
                                                          (10,14)]
-                                                        [S144 Connective ⇒ (14,15)]
-                                                        [S190 Formula
-                                                            [S189 LambdaFormula
-                                                                [S188 LambdaApplication
-                                                                    [S161 AbstractionVariable Q (15,16)]
-                                                                 (
-                                                                    [S186 TermOrFormula
-                                                                        [S185 Term
-                                                                            [S174 Variable x (17,18)]
-                                                                         (17,18)]
-                                                                     (17,18)] ) (15,19)]
-                                                             (15,19)]
+                                                        [S143 Connective ⇒ (14,15)]
+                                                        [S188 Formula
+                                                            [S187 AtomicFormula
+                                                                [S160 AbstractionVariable Q (15,16)]
+                                                             (
+                                                                [S185 TermOrFormula
+                                                                    [S184 Term
+                                                                        [S173 Variable x (17,18)]
+                                                                     (17,18)]
+                                                                 (17,18)] ) (15,19)]
                                                          (15,19)]
                                                      (10,19)]
                                                  (10,19)] ) (9,20)]
@@ -358,18 +354,18 @@ class FirstOrderLogicSpec extends Specification {
                          (4,20)] ) (3,21)]
                  (0,21)]
              (
-                [S276 TermOrFormula
-                    [S275 Formula
-                        [S273 LambdaFormula
-                            [S271 LambdaAbstraction λ
-                                [S238 Variable x (23,24)] .
-                                [S270 Formula
-                                    [S269 AtomicFormula
-                                        [S256 Predicate Restaurant (25,26)]
+                [S274 TermOrFormula
+                    [S273 Formula
+                        [S271 LambdaFormula
+                            [S269 LambdaAbstraction λ
+                                [S236 Variable x (23,24)] .
+                                [S268 Formula
+                                    [S267 AtomicFormula
+                                        [S254 Predicate Restaurant (25,26)]
                                      (
-                                        [S266 TermList
-                                            [S265 Term
-                                                [S264 Variable x (27,28)]
+                                        [S264 TermList
+                                            [S263 Term
+                                                [S262 Variable x (27,28)]
                                              (27,28)]
                                          (27,28)] ) (25,29)]
                                  (25,29)]
@@ -388,21 +384,21 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λQ.∀x(Restaurant(x)⇒Q(x))(λy.∃e(Closed(e)∧ClosedThing(e,y)))')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S317 S
-    [S316 Formula
-        [S315 LambdaFormula
-            [S314 LambdaApplication
-                [S149 LambdaAbstraction λ
+        prettyPrint(p.completedParsesString) == """[S316 S
+    [S315 Formula
+        [S314 LambdaFormula
+            [S313 LambdaApplication
+                [S148 LambdaAbstraction λ
                     [S19 AbstractionVariable Q (1,2)] .
-                    [S148 Formula
-                        [S146 QuantifiedFormula
+                    [S147 Formula
+                        [S145 QuantifiedFormula
                             [S37 Quantifier ∀ (3,4)]
                             [S42 VariableList
                                 [S41 Variable x (4,5)]
                              (4,5)]
-                            [S145 Formula (
-                                [S142 Formula
-                                    [S140 LogicFormula
+                            [S144 Formula (
+                                [S141 Formula
+                                    [S139 LogicFormula
                                         [S90 Formula
                                             [S89 AtomicFormula
                                                 [S76 Predicate Restaurant (6,7)]
@@ -414,17 +410,15 @@ class FirstOrderLogicSpec extends Specification {
                                                  (8,9)] ) (6,10)]
                                          (6,10)]
                                         [S93 Connective ⇒ (10,11)]
-                                        [S139 Formula
-                                            [S138 LambdaFormula
-                                                [S137 LambdaApplication
-                                                    [S110 AbstractionVariable Q (11,12)]
-                                                 (
-                                                    [S135 TermOrFormula
-                                                        [S134 Term
-                                                            [S123 Variable x (13,14)]
-                                                         (13,14)]
-                                                     (13,14)] ) (11,15)]
-                                             (11,15)]
+                                        [S138 Formula
+                                            [S137 AtomicFormula
+                                                [S110 AbstractionVariable Q (11,12)]
+                                             (
+                                                [S135 TermOrFormula
+                                                    [S134 Term
+                                                        [S123 Variable x (13,14)]
+                                                     (13,14)]
+                                                 (13,14)] ) (11,15)]
                                          (11,15)]
                                      (6,15)]
                                  (6,15)] ) (5,16)]
@@ -432,42 +426,42 @@ class FirstOrderLogicSpec extends Specification {
                      (3,16)]
                  (0,16)]
              (
-                [S311 TermOrFormula
-                    [S310 Formula
-                        [S308 LambdaFormula
-                            [S306 LambdaAbstraction λ
-                                [S179 Variable y (18,19)] .
-                                [S305 Formula
-                                    [S303 QuantifiedFormula
-                                        [S197 Quantifier ∃ (20,21)]
-                                        [S202 VariableList
-                                            [S201 Variable e (21,22)]
+                [S310 TermOrFormula
+                    [S309 Formula
+                        [S307 LambdaFormula
+                            [S305 LambdaAbstraction λ
+                                [S178 Variable y (18,19)] .
+                                [S304 Formula
+                                    [S302 QuantifiedFormula
+                                        [S196 Quantifier ∃ (20,21)]
+                                        [S201 VariableList
+                                            [S200 Variable e (21,22)]
                                          (21,22)]
-                                        [S302 Formula (
-                                            [S299 Formula
-                                                [S297 LogicFormula
-                                                    [S250 Formula
-                                                        [S249 AtomicFormula
-                                                            [S236 Predicate Closed (23,24)]
+                                        [S301 Formula (
+                                            [S298 Formula
+                                                [S296 LogicFormula
+                                                    [S249 Formula
+                                                        [S248 AtomicFormula
+                                                            [S235 Predicate Closed (23,24)]
                                                          (
-                                                            [S246 TermList
-                                                                [S245 Term
-                                                                    [S244 Variable e (25,26)]
+                                                            [S245 TermList
+                                                                [S244 Term
+                                                                    [S243 Variable e (25,26)]
                                                                  (25,26)]
                                                              (25,26)] ) (23,27)]
                                                      (23,27)]
-                                                    [S253 Connective ∧ (27,28)]
-                                                    [S296 Formula
-                                                        [S295 AtomicFormula
-                                                            [S270 Predicate ClosedThing (28,29)]
+                                                    [S252 Connective ∧ (27,28)]
+                                                    [S295 Formula
+                                                        [S294 AtomicFormula
+                                                            [S269 Predicate ClosedThing (28,29)]
                                                          (
-                                                            [S293 TermList
-                                                                [S279 Term
-                                                                    [S278 Variable e (30,31)]
+                                                            [S292 TermList
+                                                                [S278 Term
+                                                                    [S277 Variable e (30,31)]
                                                                  (30,31)] ,
-                                                                [S291 TermList
-                                                                    [S290 Term
-                                                                        [S289 Variable y (32,33)]
+                                                                [S290 TermList
+                                                                    [S289 Term
+                                                                        [S288 Variable y (32,33)]
                                                                      (32,33)]
                                                                  (32,33)]
                                                              (30,33)] ) (28,34)]
@@ -517,11 +511,11 @@ LambdaFormula -> LambdaApplication
 LambdaAbstraction -> λ Variable . Formula
 LambdaAbstraction -> λ AbstractionVariable . Formula
 LambdaApplication -> LambdaAbstraction ( TermOrFormula )
-LambdaApplication -> AbstractionVariable ( TermOrFormula )
 QuantifiedFormula -> Quantifier VariableList Formula
 LogicFormula -> Formula Connective Formula
 LogicFormula -> ¬ Formula
 AtomicFormula -> Predicate ( TermList )
+AtomicFormula -> AbstractionVariable ( TermOrFormula )
 TermOrFormula -> Term
 TermOrFormula -> Formula
 VariableList -> Variable
