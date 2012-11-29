@@ -3,7 +3,7 @@ import java.util.regex.Pattern
 /**
  * First-Order Logic with Lambda notation.
  * This supports λ-reductions (a.k.a. β-reductions),
- * but does not go so far as to perform logical inference or production.
+ * but does not go so far as to perform logical inference or productions.
  */
 class FirstOrderLogic {
 
@@ -11,13 +11,14 @@ class FirstOrderLogic {
     static final LAMBDA = 'λ'
 
     static final GRAMMAR = new Grammar("""S -> Formula
-        Formula -> LogicFormula | LambdaFormula | Quantifier VariableList Formula | ( Formula )
+        Formula -> LambdaFormula | QuantifiedFormula | LogicFormula | AtomicFormula | ( Formula )
         LambdaFormula -> LambdaAbstraction | LambdaApplication
         LambdaAbstraction -> λ Variable . Formula | λ AbstractionVariable . Formula
         LambdaApplication -> LambdaAbstraction ( TermOrFormula ) | AbstractionVariable ( TermOrFormula )
-        TermOrFormula -> Term | Formula
-        LogicFormula -> AtomicFormula | Formula Connective Formula | ¬ Formula
+        QuantifiedFormula -> Quantifier VariableList Formula
+        LogicFormula -> Formula Connective Formula | ¬ Formula
         AtomicFormula -> Predicate ( TermList )
+        TermOrFormula -> Term | Formula
         VariableList -> Variable | Variable , VariableList
         TermList -> Term | Term , TermList
         Term -> Function ( TermList ) | Constant | Variable
@@ -42,6 +43,16 @@ class FirstOrderLogic {
 
     static EarleyParser parse(String input) {
         Pattern lexer = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
-        new EarleyParser(input, GRAMMAR, lexer)
+        def result = new EarleyParser(input, GRAMMAR, lexer)
+        switch (result.completedParses.size()) {
+            case 0:
+                throw new IllegalArgumentException("unparsable input $input\n chart: $result")
+            case 1:
+                return result
+            default:
+                def prettyParses = Parser.prettyPrint(result.completedParsesString)
+                def detail = "chart: $result \n has multiple parses: \n $prettyParses"
+                throw new IllegalArgumentException("ambiguous input $input\n $detail")
+        }
     }
 }
