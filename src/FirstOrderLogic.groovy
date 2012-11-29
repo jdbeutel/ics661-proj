@@ -44,7 +44,8 @@ class FirstOrderLogic {
     static EarleyParser parse(String input) {
         Pattern lexer = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
         def result = new EarleyParser(input, GRAMMAR, lexer)
-        switch (result.completedParses.size()) {
+        def count = result.completedParses.size()
+        switch (count) {
             case 0:
                 throw new IllegalArgumentException("unparsable input $input\n chart: $result")
             case 1:
@@ -52,7 +53,7 @@ class FirstOrderLogic {
             default:
                 def prettyParses = Parser.prettyPrint(result.completedParsesString)
                 def detail = "chart: $result \n has multiple parses: \n $prettyParses"
-                throw new IllegalArgumentException("ambiguous input $input\n $detail")
+                throw new IllegalArgumentException("ambiguous input ($count parses) $input\n $detail")
         }
     }
 }
