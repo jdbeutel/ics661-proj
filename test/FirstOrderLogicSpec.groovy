@@ -2,6 +2,13 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 import static parser.Parser.prettyPrint
+import fol.FirstOrderLogic
+import fol.lambda.TermList
+import fol.lambda.Symbol
+import fol.lambda.Variable
+import fol.lambda.Abstraction
+import fol.lambda.Application
+import fol.lambda.VariableApplication
 
 /**
  * Test specification of FirstOrderLogic.
