@@ -11,17 +11,16 @@ class FirstOrderLogicSpec extends Specification {
     def 'basic expression containing abstraction'() {
 
         given:
-        def y = new Variable('y')
         def exp = new TermList([
                 new Abstraction(
-                        boundVar: y,
-                        expr: new TermList(['Near', '(', 'Bacaro', ',', y, ')'])
+                        boundVar: new Variable('y'),
+                        expr: new TermList(['Near', '(', 'Bacaro', ',', new Variable('y'), ')'])
                 )
         ])
 
         expect:
-        exp[0].boundVar == y
-        exp[0].expr[4] == y
+        exp[0].boundVar == new Variable('y')
+        exp[0].expr[4] == new Variable('y')
 
         and:
         exp.toString() == 'λy.(Near(Bacaro,y))'
@@ -30,18 +29,17 @@ class FirstOrderLogicSpec extends Specification {
     def 'basic reduction'() {
 
         given:
-        def y = new Variable('y')
         def app = new Application(
                 abstraction: new Abstraction(
-                        boundVar: y,
-                        expr: new TermList(['Near', '(', 'Bacaro', ',', y, ')'])
+                        boundVar: new Variable('y'),
+                        expr: new TermList(['Near', '(', 'Bacaro', ',', new Variable('y'), ')'])
                 ),
                 term: new Symbol('Centro')
         )
 
         expect:
-        app.abstraction.boundVar == y
-        app.abstraction.expr[4] == y
+        app.abstraction.boundVar == new Variable('y')
+        app.abstraction.expr[4] == new Variable('y')
         app.term.symbol == 'Centro'
         app.reduction() == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
 
@@ -53,25 +51,23 @@ class FirstOrderLogicSpec extends Specification {
     def 'basic alpha-conversion'() {
 
         given:
-        def x = new Variable('x')
-        def y = new Variable('y')
         def app = new Application(
                 abstraction: new Abstraction(
-                        boundVar: x,
+                        boundVar: new Variable('x'),
                         expr: new TermList([
                                 new Abstraction(
-                                        boundVar: y,
-                                        expr: new TermList([x])
+                                        boundVar: new Variable('y'),
+                                        expr: new TermList([new Variable('x')])
                                 )
                         ])
                 ),
-                term: y
+                term: new Variable('y')
         )
 
         expect:
         app.reduction() == new TermList([
                 new Abstraction(
-                        boundVar: y,
+                        boundVar: new Variable('y'),
                         expr: new TermList([new Variable('z')])
                 )
         ])
@@ -84,45 +80,41 @@ class FirstOrderLogicSpec extends Specification {
     def 'variable application reduction'() {
 
         given:
-        def P = new Variable('P')
-        def Q = new Variable('Q')
-        def x1 = new Variable('x')
-        def x2 = new Variable('x')
         def app = new Application(
                 abstraction: new Abstraction(
-                        boundVar: P,
+                        boundVar: new Variable('P'),
                         expr: new TermList([new Abstraction(
-                                boundVar: Q,
+                                boundVar: new Variable('Q'),
                                 expr: new TermList([
                                         '∀',
-                                        x1,
-                                        new VariableApplication(boundAbstractionVar: P, term: x1),
+                                        new Variable('x'),
+                                        new VariableApplication(boundAbstractionVar: new Variable('P'), term: new Variable('x')),
                                         '⇒',
-                                        new VariableApplication(boundAbstractionVar: Q, term: x1),
+                                        new VariableApplication(boundAbstractionVar: new Variable('Q'), term: new Variable('x')),
                                 ])
                         )])
                 ),
                 term: new Abstraction(
-                        boundVar: x2,
-                        expr: new TermList(['Restaurant', '(', x2, ')'])
+                        boundVar: new Variable('x'),
+                        expr: new TermList(['Restaurant', '(', new Variable('x'), ')'])
                 )
         )
 
         expect:
         app.reduction() == new TermList([new Abstraction(
-                boundVar: Q,
+                boundVar: new Variable('Q'),
                 expr: new TermList([
                         '∀',
-                        x1,
+                        new Variable('x'),
                         new Application(
                                 abstraction: new Abstraction(
-                                        boundVar: x1,           // term's bound vars don't need alpha-conversion
-                                        expr: new TermList(['Restaurant', '(', x1, ')'])
+                                        boundVar: new Variable('x'),           // term's bound vars don't need alpha-conversion
+                                        expr: new TermList(['Restaurant', '(', new Variable('x'), ')'])
                                 ),
-                                term: x1
+                                term: new Variable('x')
                         ),
                         '⇒',
-                        new VariableApplication(boundAbstractionVar: Q, term: x1),
+                        new VariableApplication(boundAbstractionVar: new Variable('Q'), term: new Variable('x')),
                 ])
         )])
 
