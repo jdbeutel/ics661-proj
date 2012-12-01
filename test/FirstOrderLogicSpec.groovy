@@ -8,6 +8,46 @@ import static Parser.prettyPrint
  */
 class FirstOrderLogicSpec extends Specification {
 
+    def 'basic expression containing abstraction'() {
+
+        given:
+        def y = new Variable(name: 'y')
+        def exp = new TermList([
+                new Abstraction(
+                        boundVar: y,
+                        expr: new TermList(['Near', '(', 'Bacaro', ',', y, ')'])
+                )
+        ])
+
+        expect:
+        exp[0].boundVar == y
+        exp[0].expr[4] == y
+    }
+
+    def 'basic reduction'() {
+
+        given:
+        def y = new Variable(name: 'y')
+        def app = new Application(
+                abstraction: new Abstraction(
+                        boundVar: y,
+                        expr: new TermList(['Near', '(', 'Bacaro', ',', y, ')'])
+                ),
+                term: new Symbol('Centro')
+        )
+
+        expect:
+        app.abstraction.boundVar == y
+        app.abstraction.expr[4] == y
+        app.term.symbol == 'Centro'
+
+        when:
+        def red = app.reduction()
+
+        then:
+        red == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
+    }
+
     @Unroll
     def 'symbolic char #c is not a letter, digit, or whitespace'() {
 
@@ -26,6 +66,39 @@ class FirstOrderLogicSpec extends Specification {
 
         expect:
         c.isLetter()
+    }
+
+    def "groovy incrementing char"() {
+
+        given:
+        char c = 'x'
+
+        when:
+        c++
+
+        then:
+        c == 'y'
+    }
+
+    def "groovy incrementing String"() {
+
+        given:
+        String s = 'x'
+
+        when:
+        s++
+
+        then:
+        s == 'y'
+    }
+
+    def "groovy sub-indexes"() {
+
+        given:
+        def x = ['a', 'b', 'c']
+
+        expect:
+        x[2..-1] + x[0..1] == ['c', 'a', 'b']
     }
 
     def 'FOL grammar is not normalized'() {
