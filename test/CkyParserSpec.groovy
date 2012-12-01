@@ -52,6 +52,12 @@ class CkyParserSpec extends Specification {
         '[S book {.123}];[S chair {.123}]'          || '[S book {.123}]\\;\\[S chair {.123}]'
     }
 
+    def 'work-around to avoid unresolved test name in IntelliJ'() {
+
+        expect:
+        true        // not a real test
+    }
+
     static final L1_DEF = """S -> NP VP     [.80]
 S -> Aux NP VP              [.15]
 S -> VP                     [.05]
