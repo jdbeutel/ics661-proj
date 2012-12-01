@@ -43,11 +43,11 @@ class FirstOrderLogic {
         Function -> LocationOf | CuisineOf | IntervalOf | MemberOf """)
 
     static List<String> getVariablesNames() {
-        GRAMMAR.rulesFor('Variable').symbols[0]
+        GRAMMAR.rulesFor('Variable').collect { it.symbols[0] }
     }
 
     static List<String> getAbstractionVariablesNames() {
-        GRAMMAR.rulesFor('AbstractionVariable').symbols[0]
+        GRAMMAR.rulesFor('AbstractionVariable').collect { it.symbols[0] }
     }
 
     static EarleyParser parse(String input) {
@@ -109,6 +109,10 @@ class TermList extends Term {
             tail[i-1]
         }
     }
+
+    String toString() {
+        "$head${ tail ?: ''}"
+    }
 }
 
 abstract class Term {
@@ -153,12 +157,20 @@ class Symbol extends SingleTerm {
     Set<Variable> getBoundVariables() {
         []      // none
     }
+
+    String toString() {
+        symbol
+    }
 }
 
 // FOL or Lambda variable
 @EqualsAndHashCode  // using name for identity
 class Variable extends SingleTerm {
     String name
+
+    Variable(String s) {
+        name = s
+    }
 
     Variable alphaConversion(Variable from, Variable to) {
         (Variable) substitution(from, to)
@@ -179,6 +191,10 @@ class Variable extends SingleTerm {
 
     Set<Variable> getBoundVariables() {
         []      // none
+    }
+
+    String toString() {
+        name
     }
 }
 
@@ -207,6 +223,10 @@ class Abstraction extends SingleTerm {
 
     Set<Variable> getBoundVariables() {
         expr.boundVariables + boundVar
+    }
+
+    String toString() {
+        "λ${boundVar}.($expr)"
     }
 }
 
@@ -250,7 +270,7 @@ class Application extends SingleTerm {
         assert w in allVars && w in e.freeVariables
         allVars += e.freeVariables + e.boundVariables   // gains previous conversion on each call
         for (n in candidateNames(w)) {
-            Variable v = new Variable(name: n)
+            Variable v = new Variable(n)
             if (!(v in allVars)) {
                 return v
             }
@@ -271,6 +291,10 @@ class Application extends SingleTerm {
             varNames = varNames.subList(idx, varNames.size()) + varNames.subList(0, idx - 1)
         }
         varNames
+    }
+
+    String toString() {
+        "$abstraction($term)"
     }
 }
 
@@ -300,5 +324,9 @@ class VariableApplication extends SingleTerm {
 
     Set<Variable> getBoundVariables() {
         boundAbstractionVar.boundVariables + term.boundVariables
+    }
+
+    String toString() {
+        " $boundAbstractionVar($term)"
     }
 }

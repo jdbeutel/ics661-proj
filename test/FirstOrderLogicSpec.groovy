@@ -11,7 +11,7 @@ class FirstOrderLogicSpec extends Specification {
     def 'basic expression containing abstraction'() {
 
         given:
-        def y = new Variable(name: 'y')
+        def y = new Variable('y')
         def exp = new TermList([
                 new Abstraction(
                         boundVar: y,
@@ -22,12 +22,15 @@ class FirstOrderLogicSpec extends Specification {
         expect:
         exp[0].boundVar == y
         exp[0].expr[4] == y
+
+        and:
+        exp.toString() == 'λy.(Near(Bacaro,y))'
     }
 
     def 'basic reduction'() {
 
         given:
-        def y = new Variable(name: 'y')
+        def y = new Variable('y')
         def app = new Application(
                 abstraction: new Abstraction(
                         boundVar: y,
@@ -40,12 +43,92 @@ class FirstOrderLogicSpec extends Specification {
         app.abstraction.boundVar == y
         app.abstraction.expr[4] == y
         app.term.symbol == 'Centro'
+        app.reduction() == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
 
-        when:
-        def red = app.reduction()
+        and:
+        app.toString() == 'λy.(Near(Bacaro,y))(Centro)'
+        app.reduction().toString() == 'Near(Bacaro,Centro)'
+    }
 
-        then:
-        red == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
+    def 'basic alpha-conversion'() {
+
+        given:
+        def x = new Variable('x')
+        def y = new Variable('y')
+        def app = new Application(
+                abstraction: new Abstraction(
+                        boundVar: x,
+                        expr: new TermList([
+                                new Abstraction(
+                                        boundVar: y,
+                                        expr: new TermList([x])
+                                )
+                        ])
+                ),
+                term: y
+        )
+
+        expect:
+        app.reduction() == new TermList([
+                new Abstraction(
+                        boundVar: y,
+                        expr: new TermList([new Variable('z')])
+                )
+        ])
+
+        and:
+        app.toString() == 'λx.(λy.(x))(y)'
+        app.reduction().toString() == 'λy.(z)'
+    }
+
+    def 'variable application reduction'() {
+
+        given:
+        def P = new Variable('P')
+        def Q = new Variable('Q')
+        def x1 = new Variable('x')
+        def x2 = new Variable('x')
+        def app = new Application(
+                abstraction: new Abstraction(
+                        boundVar: P,
+                        expr: new TermList([new Abstraction(
+                                boundVar: Q,
+                                expr: new TermList([
+                                        '∀',
+                                        x1,
+                                        new VariableApplication(boundAbstractionVar: P, term: x1),
+                                        '⇒',
+                                        new VariableApplication(boundAbstractionVar: Q, term: x1),
+                                ])
+                        )])
+                ),
+                term: new Abstraction(
+                        boundVar: x2,
+                        expr: new TermList(['Restaurant', '(', x2, ')'])
+                )
+        )
+
+        expect:
+        app.reduction() == new TermList([new Abstraction(
+                boundVar: Q,
+                expr: new TermList([
+                        '∀',
+                        x1,
+                        new Application(
+                                abstraction: new Abstraction(
+                                        boundVar: x1,           // term's bound vars don't need alpha-conversion
+                                        expr: new TermList(['Restaurant', '(', x1, ')'])
+                                ),
+                                term: x1
+                        ),
+                        '⇒',
+                        new VariableApplication(boundAbstractionVar: Q, term: x1),
+                ])
+        )])
+
+        and:
+        app.toString() == 'λP.(λQ.(∀x P(x)⇒ Q(x)))(λx.(Restaurant(x)))'
+        app.reduction().toString() == 'λQ.(∀xλx.(Restaurant(x))(x)⇒ Q(x))'
     }
 
     @Unroll
