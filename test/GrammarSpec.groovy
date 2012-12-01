@@ -1,5 +1,6 @@
 import spock.lang.Specification
 import spock.lang.Unroll
+import grammar.Grammar
 
 /**
  * Test specification of Grammar.

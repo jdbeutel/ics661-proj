@@ -1,5 +1,7 @@
 import java.util.regex.Pattern
 import groovy.transform.EqualsAndHashCode
+import parser.Parser
+import grammar.Grammar
 
 /**
  * First-Order Logic with Lambda notation.

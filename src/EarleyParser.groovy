@@ -1,5 +1,9 @@
 import java.util.regex.Pattern
 import groovy.transform.EqualsAndHashCode
+import parser.Parser
+import grammar.Grammar
+import grammar.Rule
+import grammar.Attachment
 
 /**
  * Implementation of the Earley parser, from the textbook.

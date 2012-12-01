@@ -1,4 +1,7 @@
+package parser
+
 import java.util.regex.Pattern
+import grammar.Grammar
 
 /**
  * Code common between the parser implementations.

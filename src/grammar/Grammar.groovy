@@ -1,3 +1,4 @@
+package grammar
 /**
  * A context-free grammar with optional probability attachments.
  * This class is not thread-safe.

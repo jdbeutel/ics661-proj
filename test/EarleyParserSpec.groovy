@@ -1,6 +1,7 @@
 import spock.lang.Specification
 
-import static Parser.prettyPrint
+import static parser.Parser.prettyPrint
+import grammar.Grammar
 
 /**
  * Test specification of EarleyParser.

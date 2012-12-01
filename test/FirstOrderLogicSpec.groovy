@@ -1,7 +1,7 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static Parser.prettyPrint
+import static parser.Parser.prettyPrint
 
 /**
  * Test specification of FirstOrderLogic.
@@ -108,7 +108,7 @@ class FirstOrderLogicSpec extends Specification {
                         new Variable('x'),
                         new Application(
                                 abstraction: new Abstraction(
-                                        boundVar: new Variable('x'),           // term's bound vars don't need alpha-conversion
+                                        boundVar: new Variable('x'),    // term's bound vars don't need alpha-conversion
                                         expr: new TermList(['Restaurant', '(', new Variable('x'), ')'])
                                 ),
                                 term: new Variable('x')

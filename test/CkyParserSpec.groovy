@@ -1,7 +1,9 @@
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static Parser.prettyPrint
+import static parser.Parser.prettyPrint
+import parser.cky.CkyParser
+import grammar.Grammar
 
 /**
  * Test specification of CkyParser.

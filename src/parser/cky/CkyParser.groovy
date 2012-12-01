@@ -1,4 +1,10 @@
+package parser.cky
+
 import java.util.regex.Pattern
+import parser.Parser
+import grammar.Grammar
+import grammar.Rule
+import grammar.Attachment
 
 /**
  * Implementation of the CKY algorithm, a bottom-up parse of a CNF grammar, with optional probability.
