@@ -304,9 +304,14 @@ class VariableApplication extends SingleTerm {
     Variable boundAbstractionVar
     SingleTerm term
 
+    VariableApplication(Variable v, SingleTerm t) {
+        boundAbstractionVar = v
+        term = t
+    }
+
     VariableApplication alphaConversion(Variable from, Variable to) {
         def v = boundAbstractionVar == from ? to : boundAbstractionVar
-        new VariableApplication(boundAbstractionVar: v, term: term.alphaConversion(from, to))
+        new VariableApplication(v, term.alphaConversion(from, to))
     }
 
     SingleTerm substitution(Variable v, SingleTerm e) {
@@ -314,7 +319,7 @@ class VariableApplication extends SingleTerm {
             assert e instanceof Abstraction : "substituted non-Abstraction for $v: $e"
             return new Application(abstraction: e, term: term)
         } else {
-            return new VariableApplication(boundAbstractionVar: boundAbstractionVar, term: term.substitution(v, e))
+            return new VariableApplication(boundAbstractionVar, term.substitution(v, e))
         }
     }
 

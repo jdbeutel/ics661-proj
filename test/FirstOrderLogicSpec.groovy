@@ -88,9 +88,9 @@ class FirstOrderLogicSpec extends Specification {
                                 expr: new TermList([
                                         '∀',
                                         new Variable('x'),
-                                        new VariableApplication(boundAbstractionVar: new Variable('P'), term: new Variable('x')),
+                                        new VariableApplication(new Variable('P'), new Variable('x')),
                                         '⇒',
-                                        new VariableApplication(boundAbstractionVar: new Variable('Q'), term: new Variable('x')),
+                                        new VariableApplication(new Variable('Q'), new Variable('x')),
                                 ])
                         )])
                 ),
@@ -114,7 +114,7 @@ class FirstOrderLogicSpec extends Specification {
                                 term: new Variable('x')
                         ),
                         '⇒',
-                        new VariableApplication(boundAbstractionVar: new Variable('Q'), term: new Variable('x')),
+                        new VariableApplication(new Variable('Q'), new Variable('x')),
                 ])
         )])
 
