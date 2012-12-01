@@ -2,6 +2,7 @@ import spock.lang.Specification
 
 import static parser.Parser.prettyPrint
 import grammar.Grammar
+import parser.earley.EarleyParser
 
 /**
  * Test specification of EarleyParser.

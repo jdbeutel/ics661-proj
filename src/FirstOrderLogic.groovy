@@ -2,6 +2,7 @@ import java.util.regex.Pattern
 import groovy.transform.EqualsAndHashCode
 import parser.Parser
 import grammar.Grammar
+import parser.earley.EarleyParser
 
 /**
  * First-Order Logic with Lambda notation.
