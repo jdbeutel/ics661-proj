@@ -167,6 +167,38 @@ class LambdaSpec extends Specification {
         app.reduction().reduction() == new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒', closed.expr].flatten())
     }
 
+    def 'Maharani closed'() {
+
+        given: 'compact Variable references (since separate instances are tested in specs above)'
+        def x = new Variable('x')
+        def e = new Variable('e')
+
+        and:
+        def maharani =  new Abstraction(
+                boundVar: x,
+                expr: new TermList([new VariableApplication(x, new Symbol('Maharani'))])
+        )
+        def closed = new Abstraction(
+                boundVar: x,
+                expr: new TermList([ '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', x, ')'])
+        )
+        def app = new Application( abstraction: maharani, term: closed)
+
+        expect:
+        maharani.toString() == 'λx.(x(Maharani))'
+        closed.toString() == 'λx.(∃e Closed(e)∧ClosedThing(e,x))'
+        app.toString() == 'λx.(x(Maharani))(λx.(∃e Closed(e)∧ClosedThing(e,x)))'
+
+        and: 'first level reduction'
+        app.reduction().toString() == 'λx.(∃e Closed(e)∧ClosedThing(e,x))(Maharani)'
+        app.reduction() == new TermList([new Application(abstraction: closed, term: new Symbol('Maharani'))])
+
+        and: 'second level reduction'
+        app.reduction().reduction().toString() == '∃e Closed(e)∧ClosedThing(e,Maharani)'
+        app.reduction().reduction() == new TermList([
+                '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', 'Maharani', ')'])
+    }
+
     def "groovy sublist indexes"() {
 
         given:
