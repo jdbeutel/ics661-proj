@@ -22,11 +22,22 @@ class VariableApplication extends SingleTerm {
 
     SingleTerm substitution(Variable v, SingleTerm e) {
         if (v == boundAbstractionVar) {
-            assert e instanceof Abstraction : "substituted non-Abstraction for $v: $e"
+            if (e instanceof Variable) {    // in an alpha-conversion of this boundAbstractionVar
+                return new VariableApplication(e, term.substitution(v, e))
+            }
+            assert e instanceof Abstraction : "substituted non-Abstraction and non-Variable for $v: $e"
             return new Application(abstraction: e, term: term)
         } else {
             return new VariableApplication(boundAbstractionVar, term.substitution(v, e))
         }
+    }
+
+    TermList reduction() {
+        new TermList([this])        // cannot reduce; don't know yet what alphaConversions will be needed
+    }
+
+    VariableApplication freshen(Collection<Variable> forbiddenVars) {
+        new VariableApplication(boundAbstractionVar.freshen(forbiddenVars), term.freshen(forbiddenVars))
     }
 
     Set<Variable> getFreeVariables() {
@@ -38,6 +49,6 @@ class VariableApplication extends SingleTerm {
     }
 
     String toString() {
-        " $boundAbstractionVar($term)"
+        "$boundAbstractionVar($term)"
     }
 }

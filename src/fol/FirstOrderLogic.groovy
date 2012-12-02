@@ -15,6 +15,7 @@ class FirstOrderLogic {
 
     static final SYMBOLIC_CHARS = '¬∧∨⇒∀∃().,'
     static final LAMBDA = 'λ'
+    static final Pattern LEXER = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
 
     static final GRAMMAR = new Grammar("""S -> Formula
         Formula -> LambdaFormula | QuantifiedFormula | LogicFormula | AtomicFormula | ( Formula )
@@ -56,8 +57,7 @@ class FirstOrderLogic {
     }
 
     static EarleyParser parse(String input) {
-        Pattern lexer = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
-        def result = new EarleyParser(input, GRAMMAR, lexer)
+        def result = new EarleyParser(input, GRAMMAR, LEXER)
         def count = result.completedParses.size()
         switch (count) {
             case 0:

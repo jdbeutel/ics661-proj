@@ -29,16 +29,17 @@ class Application extends SingleTerm {
 
     // Lambda-reduction (a.k.a. beta-reduction)
     TermList reduction() {
-        def e = term
-        // The Lambda Calculus rules would be satisfied if none of e.freeVariables are bound within the abstraction.
-        // However, the abstraction.freeVariables may be significant to FOL, so we'll alpha-convert those too.
-        def allVars = abstraction.boundVariables + abstraction.freeVariables
-        def collisions = e.freeVariables.intersect allVars
-        for (w in collisions) {
-            def x = findAvailable(w, e, allVars)
-            e = e.alphaConversion(w, x)
-        }
-        abstraction.expr.substitute(abstraction.boundVar, e)
+        // This reduction's substitutions will be safe if no term.freeVariables are bound within abstraction.expr.
+        // So, alpha-convert each colliding bound variable so that it is fresh (i.e., in neither term.freeVariables
+        // nor that abstraction's freeVariables).  This alphaConversion does not disturb the results,
+        // because the variable bound in an abstraction is like a local variable; any alphaConversions of it
+        // will not be visible after the abstraction is reduced in an application.
+        def freshened = abstraction.expr.freshen(term.freeVariables)
+        freshened.substitute(abstraction.boundVar, term)
+    }
+
+    Application freshen(Collection<Variable> forbiddenVars) {
+        new Application(abstraction: abstraction.freshen(forbiddenVars), term: term.freshen(forbiddenVars))
     }
 
     private Variable findAvailable(Variable w, SingleTerm e, Collection<Variable> allVars) {

@@ -63,13 +63,13 @@ class LambdaSpec extends Specification {
                 term: new Variable('y')
         )
 
-        expect:
+        expect: 'substitution into the abstraction triggers alpha-conversion of the bound variable'
         app.toString() == 'λx.(λy.(x))(y)'
-        app.reduction().toString() == 'λy.(z)'
+        app.reduction().toString() == 'λz.(y)'
         app.reduction() == new TermList([
                 new Abstraction(
-                        boundVar: new Variable('y'),
-                        expr: new TermList([new Variable('z')])
+                        boundVar: new Variable('z'),
+                        expr: new TermList([new Variable('y')])
                 )
         ])
     }
@@ -98,8 +98,8 @@ class LambdaSpec extends Specification {
         )
 
         expect:
-        app.toString() == 'λP.(λQ.(∀x P(x)⇒ Q(x)))(λx.(Restaurant(x)))'
-        app.reduction().toString() == 'λQ.(∀xλx.(Restaurant(x))(x)⇒ Q(x))'
+        app.toString() == 'λP.(λQ.(∀x P(x)⇒Q(x)))(λx.(Restaurant(x)))'
+        app.reduction().toString() == 'λQ.(∀xλx.(Restaurant(x))(x)⇒Q(x))'
         app.reduction() == new TermList([new Abstraction(
                 boundVar: new Variable('Q'),
                 expr: new TermList([
@@ -117,20 +117,37 @@ class LambdaSpec extends Specification {
                 ])
         )])
 
-//        and: 'second level reduction'
-//        app.reduction().reduction().toString() == 'λQ.(∀x Restaurant(x))⇒ Q(x))'
-//        app.reduction().reduction() == new TermList([new Abstraction(
-//                boundVar: new Variable('Q'),
-//                expr: new TermList([
-//                        '∀',
-//                        new Variable('x'),
-//                        'Restaurant',
-//                        '(',
-//                        new Variable('x'),
-//                        ')',
-//                        '⇒',
-//                        new VariableApplication(new Variable('Q'), new Variable('x')),
-//                ])
-//        )])
+        and: 'second level reduction'
+        app.reduction().reduction().toString() == 'λQ.(∀x Restaurant(x)⇒Q(x))'
+        app.reduction().reduction() == new TermList([new Abstraction(
+                boundVar: new Variable('Q'),
+                expr: new TermList([
+                        '∀',
+                        new Variable('x'),
+                        'Restaurant',
+                        '(',
+                        new Variable('x'),
+                        ')',
+                        '⇒',
+                        new VariableApplication(new Variable('Q'), new Variable('x')),
+                ])
+        )])
+    }
+
+    def "groovy sublist indexes"() {
+
+        given:
+        def x = ['a', 'b', 'c']
+
+        expect:
+        x[2..-1] + x[0..1] == ['c', 'a', 'b']
+        x.subList(0, 0) == []
+
+
+        when:
+        x[3..-1]
+
+        then:
+        thrown(IndexOutOfBoundsException)
     }
 }

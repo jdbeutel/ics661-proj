@@ -21,6 +21,14 @@ class Symbol extends SingleTerm {
         this    // unchanged
     }
 
+    TermList reduction() {
+        new TermList([this])    // cannot reduce
+    }
+
+    Symbol freshen(Collection<Variable> forbiddenVars) {
+        this    // cannot freshen
+    }
+
     Set<Variable> getFreeVariables() {
         []      // none
     }

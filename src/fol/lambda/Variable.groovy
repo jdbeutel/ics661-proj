@@ -26,6 +26,14 @@ class Variable extends SingleTerm {
         }
     }
 
+    TermList reduction() {
+        new TermList([this])    // cannot reduce
+    }
+
+    Variable freshen(Collection<Variable> forbiddenVars) {
+        this    // cannot freshen
+    }
+
     Set<Variable> getFreeVariables() {
         [this]                  // FV(x) = {x}, where x is a variable
     }
