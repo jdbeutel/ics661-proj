@@ -1,12 +1,8 @@
 package fol.lambda
 
-abstract class Term {
+interface Term {
 
-    abstract Set<Variable> getFreeVariables()
+    Set<Variable> getFreeVariables()
 
-    abstract Set<Variable> getBoundVariables()
-
-//    boolean isClosed() {
-//        !freeVariables
-//    }
+    Set<Variable> getBoundVariables()
 }

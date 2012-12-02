@@ -1,6 +1,6 @@
 package fol.lambda
 
-abstract class SingleTerm extends Term {
+abstract class SingleTerm implements Term {
 
     abstract SingleTerm alphaConversion(Variable from, Variable to)
 

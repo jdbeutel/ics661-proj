@@ -40,11 +40,11 @@ class LambdaSpec extends Specification {
         app.abstraction.boundVar == new Variable('y')
         app.abstraction.expr[4] == new Variable('y')
         app.term.symbol == 'Centro'
-        app.reduction() == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
 
         and:
         app.toString() == 'λy.(Near(Bacaro,y))(Centro)'
         app.reduction().toString() == 'Near(Bacaro,Centro)'
+        app.reduction() == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
     }
 
     def 'basic alpha-conversion'() {
@@ -64,16 +64,14 @@ class LambdaSpec extends Specification {
         )
 
         expect:
+        app.toString() == 'λx.(λy.(x))(y)'
+        app.reduction().toString() == 'λy.(z)'
         app.reduction() == new TermList([
                 new Abstraction(
                         boundVar: new Variable('y'),
                         expr: new TermList([new Variable('z')])
                 )
         ])
-
-        and:
-        app.toString() == 'λx.(λy.(x))(y)'
-        app.reduction().toString() == 'λy.(z)'
     }
 
     def 'variable application reduction'() {
@@ -100,6 +98,8 @@ class LambdaSpec extends Specification {
         )
 
         expect:
+        app.toString() == 'λP.(λQ.(∀x P(x)⇒ Q(x)))(λx.(Restaurant(x)))'
+        app.reduction().toString() == 'λQ.(∀xλx.(Restaurant(x))(x)⇒ Q(x))'
         app.reduction() == new TermList([new Abstraction(
                 boundVar: new Variable('Q'),
                 expr: new TermList([
@@ -117,8 +117,20 @@ class LambdaSpec extends Specification {
                 ])
         )])
 
-        and:
-        app.toString() == 'λP.(λQ.(∀x P(x)⇒ Q(x)))(λx.(Restaurant(x)))'
-        app.reduction().toString() == 'λQ.(∀xλx.(Restaurant(x))(x)⇒ Q(x))'
+//        and: 'second level reduction'
+//        app.reduction().reduction().toString() == 'λQ.(∀x Restaurant(x))⇒ Q(x))'
+//        app.reduction().reduction() == new TermList([new Abstraction(
+//                boundVar: new Variable('Q'),
+//                expr: new TermList([
+//                        '∀',
+//                        new Variable('x'),
+//                        'Restaurant',
+//                        '(',
+//                        new Variable('x'),
+//                        ')',
+//                        '⇒',
+//                        new VariableApplication(new Variable('Q'), new Variable('x')),
+//                ])
+//        )])
     }
 }

@@ -32,6 +32,7 @@ class Abstraction extends SingleTerm {
     }
 
     String toString() {
-        "λ${boundVar}.($expr)"
+        def exprStr = expr.toString()   // hack: to get GString to use List's overridden toString()
+        "λ${boundVar}.($exprStr)"
     }
 }
