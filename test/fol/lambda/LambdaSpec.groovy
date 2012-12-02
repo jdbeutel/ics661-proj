@@ -134,6 +134,39 @@ class LambdaSpec extends Specification {
         )])
     }
 
+    def 'finishing "every restaurant closed"'() {
+
+        given: 'compact Variable references (since separate instances are tested in specs above)'
+        def x = new Variable('x')
+        def e = new Variable('e')
+        def Q = new Variable('Q')
+
+        and:
+        def everyRestaurant =  new Abstraction(
+                boundVar: Q,
+                expr: new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒', new VariableApplication(Q, x)])
+        )
+        def closed = new Abstraction(
+                boundVar: x,
+                expr: new TermList([ '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', x, ')'])
+        )
+        def app = new Application( abstraction: everyRestaurant, term: closed)
+
+        expect:
+        everyRestaurant.toString() == 'λQ.(∀x Restaurant(x)⇒Q(x))'
+        closed.toString() == 'λx.(∃e Closed(e)∧ClosedThing(e,x))'
+        app.toString() == 'λQ.(∀x Restaurant(x)⇒Q(x))(λx.(∃e Closed(e)∧ClosedThing(e,x)))'
+
+        and: 'first level reduction'
+        app.reduction().toString() == '∀x Restaurant(x)⇒λx.(∃e Closed(e)∧ClosedThing(e,x))(x)'
+        app.reduction() == new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒',
+                new Application(abstraction: closed, term: x)])
+
+        and: 'second level reduction'
+        app.reduction().reduction().toString() == '∀x Restaurant(x)⇒∃e Closed(e)∧ClosedThing(e,x)'
+        app.reduction().reduction() == new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒', closed.expr].flatten())
+    }
+
     def "groovy sublist indexes"() {
 
         given:
