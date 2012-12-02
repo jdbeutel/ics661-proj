@@ -45,6 +45,12 @@ class LambdaSpec extends Specification {
         app.toString() == 'λy.(Near(Bacaro,y))(Centro)'
         app.reduction().toString() == 'Near(Bacaro,Centro)'
         app.reduction() == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
+
+        and: 'normalization'
+        new TermList([app]).normalizationString == [
+                'λy.(Near(Bacaro,y))(Centro)',
+                'Near(Bacaro,Centro)'
+        ].join('\n')
     }
 
     def 'basic alpha-conversion'() {
@@ -72,6 +78,12 @@ class LambdaSpec extends Specification {
                         expr: new TermList([new Variable('y')])
                 )
         ])
+
+        and: 'normalization'
+        new TermList([app]).normalizationString == [
+                'λx.(λy.(x))(y)',
+                'λz.(y)'
+        ].join('\n')
     }
 
     def 'variable application reduction'() {
@@ -132,6 +144,13 @@ class LambdaSpec extends Specification {
                         new VariableApplication(new Variable('Q'), new Variable('x')),
                 ])
         )])
+
+        and: 'normalization'
+        new TermList([app]).normalizationString == [
+                'λP.(λQ.(∀x P(x)⇒Q(x)))(λx.(Restaurant(x)))',
+                'λQ.(∀xλx.(Restaurant(x))(x)⇒Q(x))',
+                'λQ.(∀x Restaurant(x)⇒Q(x))'
+        ].join('\n')
     }
 
     def 'finishing "every restaurant closed"'() {
@@ -165,6 +184,13 @@ class LambdaSpec extends Specification {
         and: 'second level reduction'
         app.reduction().reduction().toString() == '∀x Restaurant(x)⇒∃e Closed(e)∧ClosedThing(e,x)'
         app.reduction().reduction() == new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒', closed.expr].flatten())
+
+        and: 'normalization'
+        new TermList([app]).normalizationString == [
+                'λQ.(∀x Restaurant(x)⇒Q(x))(λx.(∃e Closed(e)∧ClosedThing(e,x)))',
+                '∀x Restaurant(x)⇒λx.(∃e Closed(e)∧ClosedThing(e,x))(x)',
+                '∀x Restaurant(x)⇒∃e Closed(e)∧ClosedThing(e,x)'
+        ].join('\n')
     }
 
     def 'Maharani closed'() {
@@ -197,6 +223,13 @@ class LambdaSpec extends Specification {
         app.reduction().reduction().toString() == '∃e Closed(e)∧ClosedThing(e,Maharani)'
         app.reduction().reduction() == new TermList([
                 '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', 'Maharani', ')'])
+
+        and: 'normalization'
+        new TermList([app]).normalizationString == [
+                'λx.(x(Maharani))(λx.(∃e Closed(e)∧ClosedThing(e,x)))',
+                'λx.(∃e Closed(e)∧ClosedThing(e,x))(Maharani)',
+                '∃e Closed(e)∧ClosedThing(e,Maharani)'
+        ].join('\n')
     }
 
     def "groovy sublist indexes"() {
