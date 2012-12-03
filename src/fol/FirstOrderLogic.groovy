@@ -4,7 +4,8 @@ import java.util.regex.Pattern
 
 import parser.Parser
 import grammar.Grammar
-import parser.earley.EarleyParser
+import parser.earley.*
+import fol.lambda.*
 
 /**
  * First-Order Logic with Lambda notation.
@@ -18,13 +19,14 @@ class FirstOrderLogic {
     static final Pattern LEXER = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
 
     static final GRAMMAR = new Grammar("""S -> Formula
-        Formula -> LambdaFormula | QuantifiedFormula | LogicFormula | AtomicFormula | ( Formula )
+        Formula -> LambdaFormula | QuantifiedFormula | LogicFormula | AtomicFormula | VariableApplication | ( Formula )
         LambdaFormula -> LambdaAbstraction | LambdaApplication
         LambdaAbstraction -> λ Variable . Formula | λ AbstractionVariable . Formula
         LambdaApplication -> LambdaAbstraction ( TermOrFormula )
         QuantifiedFormula -> Quantifier VariableList Formula
         LogicFormula -> Formula Connective Formula | ¬ Formula
-        AtomicFormula -> Predicate ( TermList ) | AbstractionVariable ( TermOrFormula )
+        AtomicFormula -> Predicate ( TermList )
+        VariableApplication -> AbstractionVariable ( TermOrFormula )
         TermOrFormula -> Term | Formula
         VariableList -> Variable | Variable , VariableList
         TermList -> Term | Term , TermList
@@ -69,5 +71,29 @@ class FirstOrderLogic {
                 def detail = "chart: $result \n has multiple parses: \n $prettyParses"
                 throw new IllegalArgumentException("ambiguous input ($count parses) $input\n $detail")
         }
+    }
+
+    static TermList parseLambda(String input) {
+        def ep = parse(input)
+        (TermList) buildLambda((EarleyState) ep.completedParses[0])
+    }
+
+    private static buildLambda(EarleyState folParse) {
+        assert folParse.complete
+        def symbols = folParse.rule.symbols
+        def defaultTranslation = {
+            def results = []
+            for (i in 0..<symbols.size()) {
+                def c = folParse.components[i]
+                results << c ? buildLambda(c) : new Symbol(symbols[i])
+            }
+            new TermList(results.flatten())
+        }
+        def translations = [:].withDefault {defaultTranslation} + [
+                'LambdaAbstraction':    {new Abstraction(boundVar: (Variable) buildLambda(folParse.components[1]), expr: (TermList) buildLambda(folParse.components[3]))},
+                'Variable':    {new Variable(symbols[0])}
+        ]
+        def handler = (Closure) translations[folParse.rule.nonTerminal]
+        handler()
     }
 }

@@ -44,14 +44,14 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('Restaurant(Maharani)')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S32 S
-    [S31 Formula
-        [S30 AtomicFormula
-            [S17 Predicate Restaurant (0,1)]
+        prettyPrint(p.completedParsesString) == """[S33 S
+    [S32 Formula
+        [S31 AtomicFormula
+            [S18 Predicate Restaurant (0,1)]
          (
-            [S27 TermList
-                [S26 Term
-                    [S25 Constant Maharani (2,3)]
+            [S28 TermList
+                [S27 Term
+                    [S26 Constant Maharani (2,3)]
                  (2,3)]
              (2,3)] ) (0,4)]
      (0,4)]
@@ -64,38 +64,38 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('Have(Speaker, FiveDollars) ∧ ¬Have(Speaker, LotOfTime)')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S112 S
-    [S111 Formula
-        [S109 LogicFormula
-            [S43 Formula
-                [S42 AtomicFormula
-                    [S17 Predicate Have (0,1)]
+        prettyPrint(p.completedParsesString) == """[S115 S
+    [S114 Formula
+        [S112 LogicFormula
+            [S44 Formula
+                [S43 AtomicFormula
+                    [S18 Predicate Have (0,1)]
                  (
-                    [S40 TermList
-                        [S26 Term
-                            [S25 Constant Speaker (2,3)]
+                    [S41 TermList
+                        [S27 Term
+                            [S26 Constant Speaker (2,3)]
                          (2,3)] ,
-                        [S38 TermList
-                            [S37 Term
-                                [S36 Constant FiveDollars (4,5)]
+                        [S39 TermList
+                            [S38 Term
+                                [S37 Constant FiveDollars (4,5)]
                              (4,5)]
                          (4,5)]
                      (2,5)] ) (0,6)]
              (0,6)]
-            [S46 Connective ∧ (6,7)]
-            [S108 Formula
-                [S106 LogicFormula ¬
-                    [S105 Formula
-                        [S104 AtomicFormula
-                            [S79 Predicate Have (8,9)]
+            [S47 Connective ∧ (6,7)]
+            [S111 Formula
+                [S109 LogicFormula ¬
+                    [S108 Formula
+                        [S107 AtomicFormula
+                            [S82 Predicate Have (8,9)]
                          (
-                            [S102 TermList
-                                [S88 Term
-                                    [S87 Constant Speaker (10,11)]
+                            [S105 TermList
+                                [S91 Term
+                                    [S90 Constant Speaker (10,11)]
                                  (10,11)] ,
-                                [S100 TermList
-                                    [S99 Term
-                                        [S98 Constant LotOfTime (12,13)]
+                                [S103 TermList
+                                    [S102 Term
+                                        [S101 Constant LotOfTime (12,13)]
                                      (12,13)]
                                  (12,13)]
                              (10,13)] ) (8,14)]
@@ -113,38 +113,38 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('∀x(VegetarianRestaurant(x) ⇒ Serves(x, VegetarianFood))')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S126 S
-    [S125 Formula
-        [S123 QuantifiedFormula
-            [S17 Quantifier ∀ (0,1)]
-            [S22 VariableList
-                [S21 Variable x (1,2)]
+        prettyPrint(p.completedParsesString) == """[S130 S
+    [S129 Formula
+        [S127 QuantifiedFormula
+            [S18 Quantifier ∀ (0,1)]
+            [S23 VariableList
+                [S22 Variable x (1,2)]
              (1,2)]
-            [S122 Formula (
-                [S119 Formula
-                    [S117 LogicFormula
-                        [S70 Formula
-                            [S69 AtomicFormula
-                                [S56 Predicate VegetarianRestaurant (3,4)]
+            [S126 Formula (
+                [S123 Formula
+                    [S121 LogicFormula
+                        [S73 Formula
+                            [S72 AtomicFormula
+                                [S59 Predicate VegetarianRestaurant (3,4)]
                              (
-                                [S66 TermList
-                                    [S65 Term
-                                        [S64 Variable x (5,6)]
+                                [S69 TermList
+                                    [S68 Term
+                                        [S67 Variable x (5,6)]
                                      (5,6)]
                                  (5,6)] ) (3,7)]
                          (3,7)]
-                        [S73 Connective ⇒ (7,8)]
-                        [S116 Formula
-                            [S115 AtomicFormula
-                                [S90 Predicate Serves (8,9)]
+                        [S76 Connective ⇒ (7,8)]
+                        [S120 Formula
+                            [S119 AtomicFormula
+                                [S94 Predicate Serves (8,9)]
                              (
-                                [S113 TermList
-                                    [S99 Term
-                                        [S98 Variable x (10,11)]
+                                [S117 TermList
+                                    [S103 Term
+                                        [S102 Variable x (10,11)]
                                      (10,11)] ,
-                                    [S111 TermList
-                                        [S110 Term
-                                            [S109 Constant VegetarianFood (12,13)]
+                                    [S115 TermList
+                                        [S114 Term
+                                            [S113 Constant VegetarianFood (12,13)]
                                          (12,13)]
                                      (12,13)]
                                  (10,13)] ) (8,14)]
@@ -162,26 +162,26 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λx.λy.Near(x,y)')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S94 S
-    [S93 Formula
-        [S91 LambdaFormula
-            [S89 LambdaAbstraction λ
-                [S19 Variable x (1,2)] .
-                [S88 Formula
-                    [S86 LambdaFormula
-                        [S84 LambdaAbstraction λ
-                            [S39 Variable y (4,5)] .
-                            [S83 Formula
-                                [S82 AtomicFormula
-                                    [S57 Predicate Near (6,7)]
+        prettyPrint(p.completedParsesString) == """[S97 S
+    [S96 Formula
+        [S94 LambdaFormula
+            [S92 LambdaAbstraction λ
+                [S20 Variable x (1,2)] .
+                [S91 Formula
+                    [S89 LambdaFormula
+                        [S87 LambdaAbstraction λ
+                            [S41 Variable y (4,5)] .
+                            [S86 Formula
+                                [S85 AtomicFormula
+                                    [S60 Predicate Near (6,7)]
                                  (
-                                    [S80 TermList
-                                        [S66 Term
-                                            [S65 Variable x (8,9)]
+                                    [S83 TermList
+                                        [S69 Term
+                                            [S68 Variable x (8,9)]
                                          (8,9)] ,
-                                        [S78 TermList
-                                            [S77 Term
-                                                [S76 Variable y (10,11)]
+                                        [S81 TermList
+                                            [S80 Term
+                                                [S79 Variable y (10,11)]
                                              (10,11)]
                                          (10,11)]
                                      (8,11)] ) (6,12)]
@@ -201,28 +201,28 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λx.(λy.Near(x,y))(Bacaro)')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S143 S
-    [S142 Formula
-        [S141 LambdaFormula
-            [S140 LambdaApplication
-                [S108 LambdaAbstraction λ
-                    [S19 Variable x (1,2)] .
-                    [S107 Formula (
-                        [S104 Formula
-                            [S102 LambdaFormula
-                                [S100 LambdaAbstraction λ
-                                    [S55 Variable y (5,6)] .
-                                    [S99 Formula
-                                        [S98 AtomicFormula
-                                            [S73 Predicate Near (7,8)]
+        prettyPrint(p.completedParsesString) == """[S148 S
+    [S147 Formula
+        [S146 LambdaFormula
+            [S145 LambdaApplication
+                [S112 LambdaAbstraction λ
+                    [S20 Variable x (1,2)] .
+                    [S111 Formula (
+                        [S108 Formula
+                            [S106 LambdaFormula
+                                [S104 LambdaAbstraction λ
+                                    [S58 Variable y (5,6)] .
+                                    [S103 Formula
+                                        [S102 AtomicFormula
+                                            [S77 Predicate Near (7,8)]
                                          (
-                                            [S96 TermList
-                                                [S82 Term
-                                                    [S81 Variable x (9,10)]
+                                            [S100 TermList
+                                                [S86 Term
+                                                    [S85 Variable x (9,10)]
                                                  (9,10)] ,
-                                                [S94 TermList
-                                                    [S93 Term
-                                                        [S92 Variable y (11,12)]
+                                                [S98 TermList
+                                                    [S97 Term
+                                                        [S96 Variable y (11,12)]
                                                      (11,12)]
                                                  (11,12)]
                                              (9,12)] ) (7,13)]
@@ -232,9 +232,9 @@ class FirstOrderLogicSpec extends Specification {
                          (4,13)] ) (3,14)]
                  (0,14)]
              (
-                [S138 TermOrFormula
-                    [S137 Term
-                        [S126 Constant Bacaro (15,16)]
+                [S143 TermOrFormula
+                    [S142 Term
+                        [S131 Constant Bacaro (15,16)]
                      (15,16)]
                  (15,16)] ) (0,17)]
          (0,17)]
@@ -248,22 +248,22 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λy.Near(Bacaro,y)')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S69 S
-    [S68 Formula
-        [S66 LambdaFormula
-            [S64 LambdaAbstraction λ
-                [S19 Variable y (1,2)] .
-                [S63 Formula
-                    [S62 AtomicFormula
-                        [S37 Predicate Near (3,4)]
+        prettyPrint(p.completedParsesString) == """[S71 S
+    [S70 Formula
+        [S68 LambdaFormula
+            [S66 LambdaAbstraction λ
+                [S20 Variable y (1,2)] .
+                [S65 Formula
+                    [S64 AtomicFormula
+                        [S39 Predicate Near (3,4)]
                      (
-                        [S60 TermList
-                            [S46 Term
-                                [S45 Constant Bacaro (5,6)]
+                        [S62 TermList
+                            [S48 Term
+                                [S47 Constant Bacaro (5,6)]
                              (5,6)] ,
-                            [S58 TermList
-                                [S57 Term
-                                    [S56 Variable y (7,8)]
+                            [S60 TermList
+                                [S59 Term
+                                    [S58 Variable y (7,8)]
                                  (7,8)]
                              (7,8)]
                          (5,8)] ) (3,9)]
@@ -280,18 +280,18 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('Near(Bacaro,Centro)')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S44 S
-    [S43 Formula
-        [S42 AtomicFormula
-            [S17 Predicate Near (0,1)]
+        prettyPrint(p.completedParsesString) == """[S45 S
+    [S44 Formula
+        [S43 AtomicFormula
+            [S18 Predicate Near (0,1)]
          (
-            [S40 TermList
-                [S26 Term
-                    [S25 Constant Bacaro (2,3)]
+            [S41 TermList
+                [S27 Term
+                    [S26 Constant Bacaro (2,3)]
                  (2,3)] ,
-                [S38 TermList
-                    [S37 Term
-                        [S36 Constant Centro (4,5)]
+                [S39 TermList
+                    [S38 Term
+                        [S37 Constant Centro (4,5)]
                      (4,5)]
                  (4,5)]
              (2,5)] ) (0,6)]
@@ -305,44 +305,44 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λP.(λQ.∀x(P(x)⇒Q(x)))(λx.Restaurant(x))')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S280 S
-    [S279 Formula
-        [S278 LambdaFormula
-            [S277 LambdaApplication
-                [S206 LambdaAbstraction λ
-                    [S19 AbstractionVariable P (1,2)] .
-                    [S205 Formula (
-                        [S202 Formula
-                            [S200 LambdaFormula
-                                [S198 LambdaAbstraction λ
-                                    [S55 AbstractionVariable Q (5,6)] .
-                                    [S197 Formula
-                                        [S195 QuantifiedFormula
-                                            [S73 Quantifier ∀ (7,8)]
-                                            [S78 VariableList
-                                                [S77 Variable x (8,9)]
+        prettyPrint(p.completedParsesString) == """[S291 S
+    [S290 Formula
+        [S289 LambdaFormula
+            [S288 LambdaApplication
+                [S215 LambdaAbstraction λ
+                    [S20 AbstractionVariable P (1,2)] .
+                    [S214 Formula (
+                        [S211 Formula
+                            [S209 LambdaFormula
+                                [S207 LambdaAbstraction λ
+                                    [S58 AbstractionVariable Q (5,6)] .
+                                    [S206 Formula
+                                        [S204 QuantifiedFormula
+                                            [S77 Quantifier ∀ (7,8)]
+                                            [S82 VariableList
+                                                [S81 Variable x (8,9)]
                                              (8,9)]
-                                            [S194 Formula (
-                                                [S191 Formula
-                                                    [S189 LogicFormula
-                                                        [S140 Formula
-                                                            [S139 AtomicFormula
-                                                                [S112 AbstractionVariable P (10,11)]
+                                            [S203 Formula (
+                                                [S200 Formula
+                                                    [S198 LogicFormula
+                                                        [S147 Formula
+                                                            [S146 VariableApplication
+                                                                [S118 AbstractionVariable P (10,11)]
                                                              (
-                                                                [S137 TermOrFormula
-                                                                    [S136 Term
-                                                                        [S125 Variable x (12,13)]
+                                                                [S144 TermOrFormula
+                                                                    [S143 Term
+                                                                        [S132 Variable x (12,13)]
                                                                      (12,13)]
                                                                  (12,13)] ) (10,14)]
                                                          (10,14)]
-                                                        [S143 Connective ⇒ (14,15)]
-                                                        [S188 Formula
-                                                            [S187 AtomicFormula
-                                                                [S160 AbstractionVariable Q (15,16)]
+                                                        [S150 Connective ⇒ (14,15)]
+                                                        [S197 Formula
+                                                            [S196 VariableApplication
+                                                                [S168 AbstractionVariable Q (15,16)]
                                                              (
-                                                                [S185 TermOrFormula
-                                                                    [S184 Term
-                                                                        [S173 Variable x (17,18)]
+                                                                [S194 TermOrFormula
+                                                                    [S193 Term
+                                                                        [S182 Variable x (17,18)]
                                                                      (17,18)]
                                                                  (17,18)] ) (15,19)]
                                                          (15,19)]
@@ -355,18 +355,18 @@ class FirstOrderLogicSpec extends Specification {
                          (4,20)] ) (3,21)]
                  (0,21)]
              (
-                [S274 TermOrFormula
-                    [S273 Formula
-                        [S271 LambdaFormula
-                            [S269 LambdaAbstraction λ
-                                [S236 Variable x (23,24)] .
-                                [S268 Formula
-                                    [S267 AtomicFormula
-                                        [S254 Predicate Restaurant (25,26)]
+                [S285 TermOrFormula
+                    [S284 Formula
+                        [S282 LambdaFormula
+                            [S280 LambdaAbstraction λ
+                                [S246 Variable x (23,24)] .
+                                [S279 Formula
+                                    [S278 AtomicFormula
+                                        [S265 Predicate Restaurant (25,26)]
                                      (
-                                        [S264 TermList
-                                            [S263 Term
-                                                [S262 Variable x (27,28)]
+                                        [S275 TermList
+                                            [S274 Term
+                                                [S273 Variable x (27,28)]
                                              (27,28)]
                                          (27,28)] ) (25,29)]
                                  (25,29)]
@@ -385,39 +385,39 @@ class FirstOrderLogicSpec extends Specification {
         def p = FirstOrderLogic.parse('λQ.∀x(Restaurant(x)⇒Q(x))(λy.∃e(Closed(e)∧ClosedThing(e,y)))')
 
         then:
-        prettyPrint(p.completedParsesString) == """[S316 S
-    [S315 Formula
-        [S314 LambdaFormula
-            [S313 LambdaApplication
-                [S148 LambdaAbstraction λ
-                    [S19 AbstractionVariable Q (1,2)] .
-                    [S147 Formula
-                        [S145 QuantifiedFormula
-                            [S37 Quantifier ∀ (3,4)]
-                            [S42 VariableList
-                                [S41 Variable x (4,5)]
+        prettyPrint(p.completedParsesString) == """[S327 S
+    [S326 Formula
+        [S325 LambdaFormula
+            [S324 LambdaApplication
+                [S154 LambdaAbstraction λ
+                    [S20 AbstractionVariable Q (1,2)] .
+                    [S153 Formula
+                        [S151 QuantifiedFormula
+                            [S39 Quantifier ∀ (3,4)]
+                            [S44 VariableList
+                                [S43 Variable x (4,5)]
                              (4,5)]
-                            [S144 Formula (
-                                [S141 Formula
-                                    [S139 LogicFormula
-                                        [S90 Formula
-                                            [S89 AtomicFormula
-                                                [S76 Predicate Restaurant (6,7)]
+                            [S150 Formula (
+                                [S147 Formula
+                                    [S145 LogicFormula
+                                        [S94 Formula
+                                            [S93 AtomicFormula
+                                                [S80 Predicate Restaurant (6,7)]
                                              (
-                                                [S86 TermList
-                                                    [S85 Term
-                                                        [S84 Variable x (8,9)]
+                                                [S90 TermList
+                                                    [S89 Term
+                                                        [S88 Variable x (8,9)]
                                                      (8,9)]
                                                  (8,9)] ) (6,10)]
                                          (6,10)]
-                                        [S93 Connective ⇒ (10,11)]
-                                        [S138 Formula
-                                            [S137 AtomicFormula
-                                                [S110 AbstractionVariable Q (11,12)]
+                                        [S97 Connective ⇒ (10,11)]
+                                        [S144 Formula
+                                            [S143 VariableApplication
+                                                [S115 AbstractionVariable Q (11,12)]
                                              (
-                                                [S135 TermOrFormula
-                                                    [S134 Term
-                                                        [S123 Variable x (13,14)]
+                                                [S141 TermOrFormula
+                                                    [S140 Term
+                                                        [S129 Variable x (13,14)]
                                                      (13,14)]
                                                  (13,14)] ) (11,15)]
                                          (11,15)]
@@ -427,42 +427,42 @@ class FirstOrderLogicSpec extends Specification {
                      (3,16)]
                  (0,16)]
              (
-                [S310 TermOrFormula
-                    [S309 Formula
-                        [S307 LambdaFormula
-                            [S305 LambdaAbstraction λ
-                                [S178 Variable y (18,19)] .
-                                [S304 Formula
-                                    [S302 QuantifiedFormula
-                                        [S196 Quantifier ∃ (20,21)]
-                                        [S201 VariableList
-                                            [S200 Variable e (21,22)]
+                [S321 TermOrFormula
+                    [S320 Formula
+                        [S318 LambdaFormula
+                            [S316 LambdaAbstraction λ
+                                [S185 Variable y (18,19)] .
+                                [S315 Formula
+                                    [S313 QuantifiedFormula
+                                        [S204 Quantifier ∃ (20,21)]
+                                        [S209 VariableList
+                                            [S208 Variable e (21,22)]
                                          (21,22)]
-                                        [S301 Formula (
-                                            [S298 Formula
-                                                [S296 LogicFormula
-                                                    [S249 Formula
-                                                        [S248 AtomicFormula
-                                                            [S235 Predicate Closed (23,24)]
+                                        [S312 Formula (
+                                            [S309 Formula
+                                                [S307 LogicFormula
+                                                    [S259 Formula
+                                                        [S258 AtomicFormula
+                                                            [S245 Predicate Closed (23,24)]
                                                          (
-                                                            [S245 TermList
-                                                                [S244 Term
-                                                                    [S243 Variable e (25,26)]
+                                                            [S255 TermList
+                                                                [S254 Term
+                                                                    [S253 Variable e (25,26)]
                                                                  (25,26)]
                                                              (25,26)] ) (23,27)]
                                                      (23,27)]
-                                                    [S252 Connective ∧ (27,28)]
-                                                    [S295 Formula
-                                                        [S294 AtomicFormula
-                                                            [S269 Predicate ClosedThing (28,29)]
+                                                    [S262 Connective ∧ (27,28)]
+                                                    [S306 Formula
+                                                        [S305 AtomicFormula
+                                                            [S280 Predicate ClosedThing (28,29)]
                                                          (
-                                                            [S292 TermList
-                                                                [S278 Term
-                                                                    [S277 Variable e (30,31)]
+                                                            [S303 TermList
+                                                                [S289 Term
+                                                                    [S288 Variable e (30,31)]
                                                                  (30,31)] ,
-                                                                [S290 TermList
-                                                                    [S289 Term
-                                                                        [S288 Variable y (32,33)]
+                                                                [S301 TermList
+                                                                    [S300 Term
+                                                                        [S299 Variable y (32,33)]
                                                                      (32,33)]
                                                                  (32,33)]
                                                              (30,33)] ) (28,34)]
@@ -506,6 +506,7 @@ Formula -> LambdaFormula
 Formula -> QuantifiedFormula
 Formula -> LogicFormula
 Formula -> AtomicFormula
+Formula -> VariableApplication
 Formula -> ( Formula )
 LambdaFormula -> LambdaAbstraction
 LambdaFormula -> LambdaApplication
@@ -516,7 +517,7 @@ QuantifiedFormula -> Quantifier VariableList Formula
 LogicFormula -> Formula Connective Formula
 LogicFormula -> ¬ Formula
 AtomicFormula -> Predicate ( TermList )
-AtomicFormula -> AbstractionVariable ( TermOrFormula )
+VariableApplication -> AbstractionVariable ( TermOrFormula )
 TermOrFormula -> Term
 TermOrFormula -> Formula
 VariableList -> Variable
