@@ -38,10 +38,6 @@ class Variable extends SingleTerm {
         [this]                  // FV(x) = {x}, where x is a variable
     }
 
-    Set<Variable> getBoundVariables() {
-        []      // none
-    }
-
     String toString() {
         name
     }

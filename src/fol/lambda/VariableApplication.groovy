@@ -44,10 +44,6 @@ class VariableApplication extends SingleTerm {
         boundAbstractionVar.freeVariables + term.freeVariables         // FV(M N) = FV(M) ∪ FV(N)
     }
 
-    Set<Variable> getBoundVariables() {
-        boundAbstractionVar.boundVariables + term.boundVariables
-    }
-
     String toString() {
         "$boundAbstractionVar($term)"
     }

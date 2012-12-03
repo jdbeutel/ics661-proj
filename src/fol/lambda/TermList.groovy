@@ -32,11 +32,6 @@ class TermList extends ArrayList<SingleTerm> {
         this.collect { it.freeVariables }.flatten() as Set<Variable>     // FV(M N) = FV(M) ∪ FV(N)
     }
 
-    Set<Variable> getBoundVariables() {
-        // NB: cannot use this.boundVariables.flatten(); GPaths do not seem to work properly inside the List itself
-        this.collect { it.boundVariables }.flatten() as Set<Variable>
-    }
-
     TermList reduction() {
         new TermList(this.collect { it.reduction() }.flatten())
     }

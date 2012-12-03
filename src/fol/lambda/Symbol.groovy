@@ -33,10 +33,6 @@ class Symbol extends SingleTerm {
         []      // none
     }
 
-    Set<Variable> getBoundVariables() {
-        []      // none
-    }
-
     String toString() {
         symbol
     }

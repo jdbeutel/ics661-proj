@@ -23,10 +23,6 @@ class Application extends SingleTerm {
         abstractionTerm.freeVariables + term.freeVariables         // FV(M N) = FV(M) ∪ FV(N)
     }
 
-    Set<Variable> getBoundVariables() {
-        abstractionTerm.boundVariables + term.boundVariables
-    }
-
     // Lambda-reduction (a.k.a. beta-reduction)
     TermList reduction() {
         switch (abstractionTerm) {

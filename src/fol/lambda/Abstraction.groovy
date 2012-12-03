@@ -74,10 +74,6 @@ class Abstraction extends SingleTerm {
         expr.freeVariables - boundVar            // FV(λx.M) = FV(M) - {x}
     }
 
-    Set<Variable> getBoundVariables() {
-        expr.boundVariables + boundVar
-    }
-
     String toString() {
         def exprStr = expr.toString()   // hack: to get GString to use List's overridden toString()
         "λ${boundVar}.($exprStr)"
