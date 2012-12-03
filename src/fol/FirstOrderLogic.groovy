@@ -19,7 +19,9 @@ class FirstOrderLogic {
     static final Pattern LEXER = ~("[${SYMBOLIC_CHARS}${LAMBDA}]|" + /\w+/)
 
     static final GRAMMAR = new Grammar("""S -> Formula
-        Formula -> LambdaFormula | QuantifiedFormula | LogicFormula | AtomicFormula | VariableApplication | ( Formula )
+        Formula -> LambdaFormula | QuantifiedFormula | LogicFormula
+        Formula -> AtomicFormula | VariableApplication | ParentheticalFormula
+        ParentheticalFormula -> ( Formula )
         LambdaFormula -> LambdaAbstraction | LambdaApplication
         LambdaAbstraction -> λ Variable . Formula | λ AbstractionVariable . Formula
         LambdaApplication -> LambdaAbstraction ( TermOrFormula )
@@ -73,6 +75,12 @@ class FirstOrderLogic {
         }
     }
 
+    static EarleyState parseTree(String input) {
+        def p = parse(input)
+        assert p.completedParses.size() == 1
+        p.completedParses[0]
+    }
+
     static TermList parseLambda(String input) {
         def ep = parse(input)
         (TermList) buildLambda((EarleyState) ep.completedParses[0])
@@ -93,7 +101,9 @@ class FirstOrderLogic {
         translations << [   // preserving default
                 'LambdaAbstraction':    {new Abstraction(boundVar: (Variable) buildLambda(folParse.components[1]), expr: (TermList) buildLambda(folParse.components[3]))},
                 'Variable':    {new Variable(symbols[0])},
+                'AbstractionVariable':    {new Variable(symbols[0])},
                 'VariableApplication':  {def terms = buildLambda(folParse.components[2]); assert terms.size() == 1; new VariableApplication((Variable) buildLambda(folParse.components[0]), (SingleTerm) terms[0])},
+//                'ParentheticalFormula':    {buildLambda(folParse.components[1])},
         ]
         def handler = (Closure) translations[folParse.rule.nonTerminal]
         handler()

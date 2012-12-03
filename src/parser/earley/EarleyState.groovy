@@ -90,6 +90,21 @@ class EarleyState {
         [name, ruleWithDot, [inputStartIdx, inputDotIdx], function].join('\t')
     }
 
+    String prettyPrint(int level = 0) {
+        def indentBy = ' ' * 4
+        def indent = '\n' + (indentBy * level)
+        if (components.find {it}) {     // has nested states
+            def subtrees = []
+            for (i in 0..<rule.symbols.size()) {
+                def c = components[i]
+                subtrees << (c ? c.prettyPrint(level+1) : indent + indentBy + rule.symbols[i])
+            }
+            return "$indent[${rule.nonTerminal}${subtrees.join('')}$indent]"
+        } else {
+            return "$indent[${rule.nonTerminal} ${rule.symbols.join(' ')}]"
+        }
+    }
+
     private String getRuleWithDot() {
         def withDot = [] + rule.symbols
         withDot.addAll(dotIdx, '∙')     // insert
