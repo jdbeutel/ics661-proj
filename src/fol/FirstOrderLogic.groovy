@@ -106,7 +106,7 @@ class FirstOrderLogic {
         def translations = [:].withDefault {translateToTermList}
         translations << [   // preserving default
                 'LambdaAbstraction':    {new Abstraction(boundVar: (Variable) build(1), expr: (TermList) build(3))},
-                'LambdaApplication':    {new Application(abstraction: (Abstraction) build(0), term: buildSingle(2))},
+                'LambdaApplication':    {new Application(abstractionTerm: (Abstraction) build(0), term: buildSingle(2))},
                 'Variable':             {new Variable(symbols[0])},
                 'AbstractionVariable':  {new Variable(symbols[0])},
                 'VariableApplication':  {new VariableApplication((Variable) build(0), buildSingle(2))},

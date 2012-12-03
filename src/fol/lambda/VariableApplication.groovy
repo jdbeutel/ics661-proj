@@ -22,11 +22,11 @@ class VariableApplication extends SingleTerm {
 
     SingleTerm substitution(Variable v, SingleTerm e) {
         if (v == boundAbstractionVar) {
-            if (e instanceof Variable) {    // in an alpha-conversion of this boundAbstractionVar
+            if (e instanceof Variable) {    // alpha-conversion of this boundAbstractionVar
                 return new VariableApplication(e, term.substitution(v, e))
             }
-            assert e instanceof Abstraction : "substituted non-Abstraction and non-Variable for $v: $e"
-            return new Application(abstraction: e, term: term)
+            assert e.class in [Abstraction, Application, VariableApplication] : "substituted unsuitable for $v: $e"
+            return new Application(abstractionTerm: e, term: term.substitution(v, e))
         } else {
             return new VariableApplication(boundAbstractionVar, term.substitution(v, e))
         }

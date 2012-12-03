@@ -29,7 +29,7 @@ class LambdaSpec extends Specification {
 
         given:
         def app = new Application(
-                abstraction: new Abstraction(
+                abstractionTerm: new Abstraction(
                         boundVar: new Variable('y'),
                         expr: new TermList(['Near', '(', 'Bacaro', ',', new Variable('y'), ')'])
                 ),
@@ -37,8 +37,8 @@ class LambdaSpec extends Specification {
         )
 
         expect:
-        app.abstraction.boundVar == new Variable('y')
-        app.abstraction.expr[4] == new Variable('y')
+        app.abstractionTerm.boundVar == new Variable('y')
+        app.abstractionTerm.expr[4] == new Variable('y')
         app.term.symbol == 'Centro'
 
         and:
@@ -57,7 +57,7 @@ class LambdaSpec extends Specification {
 
         given:
         def app = new Application(
-                abstraction: new Abstraction(
+                abstractionTerm: new Abstraction(
                         boundVar: new Variable('x'),
                         expr: new TermList([
                                 new Abstraction(
@@ -90,7 +90,7 @@ class LambdaSpec extends Specification {
 
         given:
         def app = new Application(
-                abstraction: new Abstraction(
+                abstractionTerm: new Abstraction(
                         boundVar: new Variable('P'),
                         expr: new TermList([new Abstraction(
                                 boundVar: new Variable('Q'),
@@ -118,7 +118,7 @@ class LambdaSpec extends Specification {
                         '∀',
                         new Variable('x'),
                         new Application(
-                                abstraction: new Abstraction(
+                                abstractionTerm: new Abstraction(
                                         boundVar: new Variable('x'),    // term's bound vars don't need alpha-conversion
                                         expr: new TermList(['Restaurant', '(', new Variable('x'), ')'])
                                 ),
@@ -169,7 +169,7 @@ class LambdaSpec extends Specification {
                 boundVar: x,
                 expr: new TermList([ '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', x, ')'])
         )
-        def app = new Application( abstraction: everyRestaurant, term: closed)
+        def app = new Application( abstractionTerm: everyRestaurant, term: closed)
 
         expect:
         everyRestaurant.toString() == 'λQ.(∀x Restaurant(x)⇒Q(x))'
@@ -179,7 +179,7 @@ class LambdaSpec extends Specification {
         and: 'first level reduction'
         app.reduction().toString() == '∀x Restaurant(x)⇒λx.(∃e Closed(e)∧ClosedThing(e,x))(x)'
         app.reduction() == new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒',
-                new Application(abstraction: closed, term: x)])
+                new Application(abstractionTerm: closed, term: x)])
 
         and: 'second level reduction'
         app.reduction().reduction().toString() == '∀x Restaurant(x)⇒∃e Closed(e)∧ClosedThing(e,x)'
@@ -208,7 +208,7 @@ class LambdaSpec extends Specification {
                 boundVar: x,
                 expr: new TermList([ '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', x, ')'])
         )
-        def app = new Application( abstraction: maharani, term: closed)
+        def app = new Application( abstractionTerm: maharani, term: closed)
 
         expect:
         maharani.toString() == 'λx.(x(Maharani))'
@@ -217,7 +217,7 @@ class LambdaSpec extends Specification {
 
         and: 'first level reduction'
         app.reduction().toString() == 'λx.(∃e Closed(e)∧ClosedThing(e,x))(Maharani)'
-        app.reduction() == new TermList([new Application(abstraction: closed, term: new Symbol('Maharani'))])
+        app.reduction() == new TermList([new Application(abstractionTerm: closed, term: new Symbol('Maharani'))])
 
         and: 'second level reduction'
         app.reduction().reduction().toString() == '∃e Closed(e)∧ClosedThing(e,Maharani)'

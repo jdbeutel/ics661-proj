@@ -301,7 +301,7 @@ class FirstOrderLogicSpec extends Specification {
 
         given:
         def input = 'λx.(λy.Near(x,y))(Bacaro)'
-        def canonicalInput = 'λx.((λy.(Near(x,y))))(Bacaro)'
+        def canonicalInput = 'λx.(λy.(Near(x,y)))(Bacaro)'
 
         when:
         def p = FirstOrderLogic.parseTree(input)
@@ -370,8 +370,8 @@ class FirstOrderLogicSpec extends Specification {
 
         and: 'already in normal form'
         l.normalizationString == [
-                'λx.((λy.(Near(x,y))))(Bacaro)',
-                '(λy.(Near(Bacaro,y)))',
+                'λx.(λy.(Near(x,y)))(Bacaro)',
+                'λy.(Near(Bacaro,y))',
         ].join('\n')
     }
 
@@ -471,7 +471,7 @@ class FirstOrderLogicSpec extends Specification {
 
         given:
         def input = 'λP.(λQ.∀x(P(x)⇒Q(x)))(λx.Restaurant(x))'
-        def canonicalInput = 'λP.((λQ.(∀x(P(x)⇒Q(x)))))(λx.(Restaurant(x)))'
+        def canonicalInput = 'λP.(λQ.(∀x(P(x)⇒Q(x))))(λx.(Restaurant(x)))'
 
         when:
         def p = FirstOrderLogic.parseTree(input)
@@ -583,9 +583,9 @@ class FirstOrderLogicSpec extends Specification {
 
         and:
         l.normalizationString == [
-                'λP.((λQ.(∀x(P(x)⇒Q(x)))))(λx.(Restaurant(x)))',
-                '(λQ.(∀x(λx.(Restaurant(x))(x)⇒Q(x))))',
-                '(λQ.(∀x(Restaurant(x)⇒Q(x))))',
+                'λP.(λQ.(∀x(P(x)⇒Q(x))))(λx.(Restaurant(x)))',
+                'λQ.(∀x(λx.(Restaurant(x))(x)⇒Q(x)))',
+                'λQ.(∀x(Restaurant(x)⇒Q(x)))',
         ].join('\n')
     }
 
@@ -746,6 +746,49 @@ class FirstOrderLogicSpec extends Specification {
         ].join('\n')
     }
 
+    def 'FOL "λX.X(Maharani)(λx.∃e(Closed(e)∧ClosedThing(e,x)))" parses as expected'() {
+
+        given:
+        def input = 'λX.X(Maharani)(λx.∃e(Closed(e)∧ClosedThing(e,x)))'
+
+        expect:
+        FirstOrderLogic.parseLambda(input).normalizationString == [
+                'λX.(X(Maharani))(λx.(∃e(Closed(e)∧ClosedThing(e,x))))',
+                'λx.(∃e(Closed(e)∧ClosedThing(e,x)))(Maharani)',
+                '∃e(Closed(e)∧ClosedThing(e,Maharani))',
+        ].join('\n')
+    }
+
+    def 'FOL "λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))" parses as expected'() {
+
+        given:
+        def properNoun = "λM.M(Matthew)"
+        def verb = "λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))"
+        def det = "λP.(λQ. ∃x(P(x)∧Q(x)))"
+        def noun = "λr.Restaurant(r)"
+        def np = "$det($noun)"
+        def vp = "$verb($np)"
+        def input = "$properNoun($vp)"
+        def input2 = 'λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))'
+        def canonicalInput = 'λM.(M(Matthew))(λW.(λz.(W(λx.(∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))))(λP.(λQ.(∃x(P(x)∧Q(x))))(λr.(Restaurant(r)))))'
+
+        when:
+        def l = FirstOrderLogic.parseLambda(input)
+
+        then:
+        input == input2
+        l.toString() == canonicalInput
+        l.normalizationString == [
+                'λM.(M(Matthew))(λW.(λz.(W(λx.(∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))))(λP.(λQ.(∃x(P(x)∧Q(x))))(λr.(Restaurant(r)))))',
+                'λW.(λz.(W(λx.(∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))))(λP.(λQ.(∃x(P(x)∧Q(x))))(λr.(Restaurant(r))))(Matthew)',
+                'λz.(λP.(λQ.(∃x(P(x)∧Q(x))))(λr.(Restaurant(r)))(λy.(∃e(Opened(e)∧(Opener(e,z)∧Opened(e,y))))))(Matthew)',
+                'λP.(λQ.(∃x(P(x)∧Q(x))))(λr.(Restaurant(r)))(λy.(∃e(Opened(e)∧(Opener(e,Matthew)∧Opened(e,y)))))',
+                'λQ.(∃x(λr.(Restaurant(r))(x)∧Q(x)))(λy.(∃e(Opened(e)∧(Opener(e,Matthew)∧Opened(e,y)))))',
+                '∃x(λr.(Restaurant(r))(x)∧λy.(∃e(Opened(e)∧(Opener(e,Matthew)∧Opened(e,y))))(x))',
+                '∃x(Restaurant(x)∧∃e(Opened(e)∧(Opener(e,Matthew)∧Opened(e,x))))',
+        ].join('\n')
+    }
+
     @Unroll
     def 'FOL "#input" is #expected'() {
 
@@ -765,6 +808,11 @@ class FirstOrderLogicSpec extends Specification {
         'λP.λQ.∀x(P(x)⇒Q(x))(λx.Restaurant(x))'                         || 'ambiguous input (2 parses)'
         'λQ.∀x Restaurant(x)⇒Q(x)(λy.∃e Closed(e)∧ClosedThing(e,y))'    || 'ambiguous input (6 parses)'
         'λQ.∀x(Restaurant(x)⇒Q(x))(λy.∃e Closed(e)∧ClosedThing(e,y))'   || 'ambiguous input (3 parses)'
+        'λx.x(Maharani)(λx.∃e(Closed(e)∧ClosedThing(e,x)))'             || 'unparsable'
+        'λM.M(Matthew)(λW.λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))'  || 'ambiguous input (2 parses)'
+        'λM.M(Matthew)(λW.(λz.W(λx.∃e Opened(e)∧(Opener(e,z)∧Opened(e,x))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))' || 'ambiguous input (3 parses)'
+        'λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧Opener(e,z)∧Opened(e,x))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))'  || 'ambiguous input (2 parses)'
+        'λM.M(Matthew)(λW.λz.W(λx.∃e(Opened(e)∧Opener(e,z)∧Opened(e,x)))(λP.(λQ.(∃x P(x)∧Q(x)))(λr.Restaurant(r))))'    || 'ambiguous input (8 parses)'
     }
 
     static final FOL_DEF = """S -> Formula

@@ -1,6 +1,5 @@
 package fol.lambda
 
-import groovy.transform.EqualsAndHashCode
 import fol.FirstOrderLogic
 
 /**
@@ -12,6 +11,12 @@ class TermList extends ArrayList<SingleTerm> {
 
     TermList(Collection terms) {
         super(terms.collect { (SingleTerm) it instanceof String ? new Symbol(it) : it })
+
+        if (size() == 3 && this[0] == new Symbol('(') && this[2] == new Symbol(')')) {
+            // hack to remove certain extra parenthesis added to disambiguate parse
+            remove(2)
+            remove(0)
+        }
     }
 
     TermList alphaConversion(Variable from, Variable to) {
