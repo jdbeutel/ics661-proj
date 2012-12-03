@@ -759,17 +759,17 @@ class FirstOrderLogicSpec extends Specification {
         ].join('\n')
     }
 
-    def 'FOL "λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))" parses as expected'() {
+    def 'FOL "λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))(λP.(λQ.∃x(P(x)∧Q(x)))(λr.Restaurant(r))))" parses as expected'() {
 
         given:
         def properNoun = "λM.M(Matthew)"
         def verb = "λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))"
-        def det = "λP.(λQ. ∃x(P(x)∧Q(x)))"
+        def det = "λP.(λQ.∃x(P(x)∧Q(x)))"
         def noun = "λr.Restaurant(r)"
         def np = "$det($noun)"
         def vp = "$verb($np)"
         def input = "$properNoun($vp)"
-        def input2 = 'λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))(λP.(λQ. ∃x(P(x)∧Q(x)))(λr.Restaurant(r))))'
+        def input2 = 'λM.M(Matthew)(λW.(λz.W(λx.∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))(λP.(λQ.∃x(P(x)∧Q(x)))(λr.Restaurant(r))))'
         def canonicalInput = 'λM.(M(Matthew))(λW.(λz.(W(λx.(∃e(Opened(e)∧(Opener(e,z)∧Opened(e,x)))))))(λP.(λQ.(∃x(P(x)∧Q(x))))(λr.(Restaurant(r)))))'
 
         when:

@@ -47,7 +47,7 @@ class LambdaSpec extends Specification {
         app.reduction() == new TermList(['Near', '(', 'Bacaro', ',', 'Centro', ')'])
 
         and: 'normalization'
-        new TermList([app]).normalizationString == [
+        app.normalizationString == [
                 'λy.(Near(Bacaro,y))(Centro)',
                 'Near(Bacaro,Centro)'
         ].join('\n')
@@ -80,7 +80,7 @@ class LambdaSpec extends Specification {
         ])
 
         and: 'normalization'
-        new TermList([app]).normalizationString == [
+        app.normalizationString == [
                 'λx.(λy.(x))(y)',
                 'λz.(y)'
         ].join('\n')
@@ -146,7 +146,7 @@ class LambdaSpec extends Specification {
         )])
 
         and: 'normalization'
-        new TermList([app]).normalizationString == [
+        app.normalizationString == [
                 'λP.(λQ.(∀x P(x)⇒Q(x)))(λx.(Restaurant(x)))',
                 'λQ.(∀xλx.(Restaurant(x))(x)⇒Q(x))',
                 'λQ.(∀x Restaurant(x)⇒Q(x))'
@@ -186,7 +186,7 @@ class LambdaSpec extends Specification {
         app.reduction().reduction() == new TermList(['∀', x, 'Restaurant', '(', x, ')', '⇒', closed.expr].flatten())
 
         and: 'normalization'
-        new TermList([app]).normalizationString == [
+        app.normalizationString == [
                 'λQ.(∀x Restaurant(x)⇒Q(x))(λx.(∃e Closed(e)∧ClosedThing(e,x)))',
                 '∀x Restaurant(x)⇒λx.(∃e Closed(e)∧ClosedThing(e,x))(x)',
                 '∀x Restaurant(x)⇒∃e Closed(e)∧ClosedThing(e,x)'
@@ -225,7 +225,7 @@ class LambdaSpec extends Specification {
                 '∃', e, 'Closed', '(', e, ')', '∧', 'ClosedThing', '(', e, ',', 'Maharani', ')'])
 
         and: 'normalization'
-        new TermList([app]).normalizationString == [
+        app.normalizationString == [
                 'λx.(x(Maharani))(λx.(∃e Closed(e)∧ClosedThing(e,x)))',
                 'λx.(∃e Closed(e)∧ClosedThing(e,x))(Maharani)',
                 '∃e Closed(e)∧ClosedThing(e,Maharani)'

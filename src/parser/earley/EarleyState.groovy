@@ -3,6 +3,8 @@ package parser.earley
 import grammar.Attachment
 import grammar.Rule
 import groovy.transform.EqualsAndHashCode
+import fol.lambda.SingleTerm
+import fol.lambda.TermList
 
 /**
  * Chart entries in an Earley parse.
@@ -123,5 +125,15 @@ class EarleyState {
             }
         }
         p
+    }
+
+    SingleTerm getLambda() {
+        def x = rule.attachment?.lambda?.call(this)
+        if (x instanceof TermList) {
+            assert x.size() == 1        // S -> foo wraps in TermList
+            return (SingleTerm) x[0]
+        } else {
+            return (SingleTerm) x
+        }
     }
 }
