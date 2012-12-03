@@ -68,6 +68,9 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == input
+
+        and: 'already in normal form'
+        l.normalizationString == input
     }
 
 
@@ -164,6 +167,9 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == input
+
+        and: 'already in normal form'
+        l.normalizationString == input
     }
 
     def 'FOL "∀x(VegetarianRestaurant(x)⇒Serves(x,VegetarianFood))" parses as expected'() {
@@ -233,6 +239,9 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == input
+
+        and: 'already in normal form'
+        l.normalizationString == input
     }
 
     def 'FOL "λx.λy.Near(x,y)" parses as expected'() {
@@ -283,6 +292,9 @@ class FirstOrderLogicSpec extends Specification {
         expect:
         FirstOrderLogic.parseTree(input).prettyPrint() == expected
         FirstOrderLogic.parseLambda(input).toString() == canonicalInput
+
+        and: 'already in normal form'
+        FirstOrderLogic.parseLambda(input).normalizationString == canonicalInput
     }
 
     def 'FOL "λx.(λy.Near(x,y))(Bacaro)" parses as expected'() {
@@ -355,6 +367,12 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == canonicalInput
+
+        and: 'already in normal form'
+        l.normalizationString == [
+                'λx.((λy.(Near(x,y))))(Bacaro)',
+                '(λy.(Near(Bacaro,y)))',
+        ].join('\n')
     }
 
     def 'FOL "λy.Near(Bacaro,y)" parses as expected'() {
@@ -403,6 +421,9 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == canonicalInput
+
+        and: 'already in normal form'
+        l.normalizationString == canonicalInput
     }
 
     def 'FOL "Near(Bacaro,Centro)" parses as expected'() {
@@ -441,6 +462,9 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == input
+
+        and: 'already in normal form'
+        l.normalizationString == input
     }
 
     def 'FOL "λP.(λQ.∀x(P(x)⇒Q(x)))(λx.Restaurant(x))" parses as expected'() {
@@ -556,6 +580,13 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == canonicalInput
+
+        and:
+        l.normalizationString == [
+                'λP.((λQ.(∀x(P(x)⇒Q(x)))))(λx.(Restaurant(x)))',
+                '(λQ.(∀x(λx.(Restaurant(x))(x)⇒Q(x))))',
+                '(λQ.(∀x(Restaurant(x)⇒Q(x))))',
+        ].join('\n')
     }
 
     def 'FOL "λQ.∀x(Restaurant(x)⇒Q(x))(λy.∃e(Closed(e)∧ClosedThing(e,y)))" parses as expected'() {
@@ -693,6 +724,26 @@ class FirstOrderLogicSpec extends Specification {
 
         then:
         l.toString() == canonicalInput
+
+        and:
+        l.normalizationString == [
+                'λQ.(∀x(Restaurant(x)⇒Q(x)))(λy.(∃e(Closed(e)∧ClosedThing(e,y))))',
+                '∀x(Restaurant(x)⇒λy.(∃e(Closed(e)∧ClosedThing(e,y)))(x))',
+                '∀x(Restaurant(x)⇒∃e(Closed(e)∧ClosedThing(e,x)))',
+        ].join('\n')
+    }
+
+    def 'FOL "λQ.∀x(Restaurant(x)⇒Q(x))(λx.∃e(Closed(e)∧ClosedThing(e,x)))" also parses as expected'() {
+
+        given:
+        def input = 'λQ.∀x(Restaurant(x)⇒Q(x))(λx.∃e(Closed(e)∧ClosedThing(e,x)))'
+
+        expect:
+        FirstOrderLogic.parseLambda(input).normalizationString == [
+                'λQ.(∀x(Restaurant(x)⇒Q(x)))(λx.(∃e(Closed(e)∧ClosedThing(e,x))))',
+                '∀x(Restaurant(x)⇒λx.(∃e(Closed(e)∧ClosedThing(e,x)))(x))',
+                '∀x(Restaurant(x)⇒∃e(Closed(e)∧ClosedThing(e,x)))',
+        ].join('\n')
     }
 
     @Unroll

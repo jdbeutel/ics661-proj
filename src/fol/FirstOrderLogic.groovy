@@ -89,7 +89,7 @@ class FirstOrderLogic {
     private static buildLambda(EarleyState folParse) {
         assert folParse.complete
         def symbols = folParse.rule.symbols
-        def defaultTranslation = {
+        def translateToTermList = {
             def results = []
             for (i in 0..<symbols.size()) {
                 def c = folParse.components[i]
@@ -97,13 +97,19 @@ class FirstOrderLogic {
             }
             new TermList(results.flatten())
         }
-        def translations = [:].withDefault {defaultTranslation}
+        def build = { int i -> buildLambda(folParse.components[i])}
+        def buildSingle =  { int i ->
+            def terms = build(i)
+            assert terms instanceof TermList && terms.size() == 1
+            (SingleTerm) terms[0]
+        }
+        def translations = [:].withDefault {translateToTermList}
         translations << [   // preserving default
-                'LambdaAbstraction':    {new Abstraction(boundVar: (Variable) buildLambda(folParse.components[1]), expr: (TermList) buildLambda(folParse.components[3]))},
-                'Variable':    {new Variable(symbols[0])},
-                'AbstractionVariable':    {new Variable(symbols[0])},
-                'VariableApplication':  {def terms = buildLambda(folParse.components[2]); assert terms.size() == 1; new VariableApplication((Variable) buildLambda(folParse.components[0]), (SingleTerm) terms[0])},
-//                'ParentheticalFormula':    {buildLambda(folParse.components[1])},
+                'LambdaAbstraction':    {new Abstraction(boundVar: (Variable) build(1), expr: (TermList) build(3))},
+                'LambdaApplication':    {new Application(abstraction: (Abstraction) build(0), term: buildSingle(2))},
+                'Variable':             {new Variable(symbols[0])},
+                'AbstractionVariable':  {new Variable(symbols[0])},
+                'VariableApplication':  {new VariableApplication((Variable) build(0), buildSingle(2))},
         ]
         def handler = (Closure) translations[folParse.rule.nonTerminal]
         handler()
