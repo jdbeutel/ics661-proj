@@ -85,13 +85,15 @@ class FirstOrderLogic {
             def results = []
             for (i in 0..<symbols.size()) {
                 def c = folParse.components[i]
-                results << c ? buildLambda(c) : new Symbol(symbols[i])
+                results << (c ? buildLambda(c) : new Symbol(symbols[i]))
             }
             new TermList(results.flatten())
         }
-        def translations = [:].withDefault {defaultTranslation} + [
+        def translations = [:].withDefault {defaultTranslation}
+        translations << [   // preserving default
                 'LambdaAbstraction':    {new Abstraction(boundVar: (Variable) buildLambda(folParse.components[1]), expr: (TermList) buildLambda(folParse.components[3]))},
-                'Variable':    {new Variable(symbols[0])}
+                'Variable':    {new Variable(symbols[0])},
+                'VariableApplication':  {def terms = buildLambda(folParse.components[2]); assert terms.size() == 1; new VariableApplication((Variable) buildLambda(folParse.components[0]), (SingleTerm) terms[0])},
         ]
         def handler = (Closure) translations[folParse.rule.nonTerminal]
         handler()

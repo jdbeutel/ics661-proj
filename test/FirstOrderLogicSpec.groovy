@@ -40,8 +40,11 @@ class FirstOrderLogicSpec extends Specification {
 
     def 'FOL "Restaurant(Maharani)" parses as expected'() {
 
+        given:
+        def input = 'Restaurant(Maharani)'
+
         when:
-        def p = FirstOrderLogic.parse('Restaurant(Maharani)')
+        def p = FirstOrderLogic.parse(input)
 
         then:
         prettyPrint(p.completedParsesString) == """[S33 S
@@ -56,6 +59,13 @@ class FirstOrderLogicSpec extends Specification {
              (2,3)] ) (0,4)]
      (0,4)]
  (0,4)]"""
+
+
+        when:
+        def l = FirstOrderLogic.parseLambda(input)
+
+        then:
+        l.toString() == input
     }
 
     def 'FOL "Have(Speaker, FiveDollars) ∧ ¬Have(Speaker, LotOfTime)" parses as expected'() {
