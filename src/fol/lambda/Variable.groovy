@@ -13,10 +13,6 @@ class Variable extends SingleTerm {
         name = s
     }
 
-    Variable alphaConversion(Variable from, Variable to) {
-        (Variable) substitution(from, to)
-    }
-
     SingleTerm substitution(Variable v, SingleTerm e) {
         if (this == v) {        // x[x := N] ≡ N
             return e            // substituted!

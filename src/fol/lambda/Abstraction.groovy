@@ -11,15 +11,11 @@ class Abstraction extends SingleTerm {
     Variable boundVar
     TermList expr
 
-    Abstraction alphaConversion(Variable from, Variable to) {
-        new Abstraction(boundVar: from == boundVar ? to : boundVar, expr: expr.alphaConversion(from, to))
-    }
-
     Abstraction substitution(Variable v, SingleTerm e) {
         if (v == boundVar) {
             return this     // (λx.M)[x := N] ≡ λx.M    (stop recursion and preserve binding)
         } else {            // (λy.M)[x := N] ≡ λy.(M[x := N]), if x ≠ y, provided y ∉ FV(N)
-            assert !(boundVar in e.freeVariables) : 'needed alphaConversion'
+            assert !(boundVar in e.freeVariables) : 'needed alpha-conversion'
             return new Abstraction(boundVar: boundVar, expr: expr.substitute(v, e))
         }
     }
@@ -30,8 +26,8 @@ class Abstraction extends SingleTerm {
 
     // This reduction's substitutions will be safe if no term.freeVariables are bound within abstraction.expr.
     // So, alpha-convert each colliding bound variable so that it is fresh (i.e., in neither term.freeVariables
-    // nor that abstraction's freeVariables).  This alphaConversion does not disturb the results,
-    // because the variable bound in an abstraction is like a local variable; any alphaConversions of it
+    // nor that abstraction's freeVariables).  This alpha-conversion does not disturb the results,
+    // because the variable bound in an abstraction is like a local variable; any alpha-conversions of it
     // will not be visible after the abstraction is reduced in an application.
     Abstraction freshen(Collection<Variable> forbiddenVars) {
         if (boundVar in forbiddenVars) {

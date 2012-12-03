@@ -19,10 +19,6 @@ class TermList extends ArrayList<SingleTerm> {
         }
     }
 
-    TermList alphaConversion(Variable from, Variable to) {
-        new TermList(this.collect { it.alphaConversion(from, to) })
-    }
-
     TermList substitute(Variable v, SingleTerm e) {     // (M N)[x := P] ≡ (M[x := P]) (N[x := P])
         new TermList(this.collect { it.substitution(v, e) }.flatten())
     }

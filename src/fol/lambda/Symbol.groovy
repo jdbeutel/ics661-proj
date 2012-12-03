@@ -13,10 +13,6 @@ class Symbol extends SingleTerm {
         symbol = s
     }
 
-    Symbol alphaConversion(Variable from, Variable to) {
-        this    // unchanged
-    }
-
     Symbol substitution(Variable v, SingleTerm e) {
         this    // unchanged
     }

@@ -11,10 +11,6 @@ class Application extends SingleTerm {
     SingleTerm abstractionTerm
     SingleTerm term
 
-    SingleTerm alphaConversion(Variable from, Variable to) {
-        new Application(abstractionTerm: abstractionTerm.alphaConversion(from, to), term: term.alphaConversion(from, to))
-    }
-
     Application substitution(Variable v, SingleTerm e) {    // (M N)[x := P] ≡ (M[x := P]) (N[x := P])
         new Application(abstractionTerm: abstractionTerm.substitution(v, e), term: term.substitution(v, e))
     }
@@ -30,8 +26,8 @@ class Application extends SingleTerm {
             case Abstraction:   // do the real reduction
                 // This reduction's substitutions will be safe if no term.freeVariables are bound within abstraction.expr.
                 // So, alpha-convert each colliding bound variable so that it is fresh (i.e., in neither term.freeVariables
-                // nor that abstraction's freeVariables).  This alphaConversion does not disturb the results,
-                // because the variable bound in an abstraction is like a local variable; any alphaConversions of it
+                // nor that abstraction's freeVariables).  This alpha-conversion does not disturb the results,
+                // because the variable bound in an abstraction is like a local variable; any alpha-conversions of it
                 // will not be visible after the abstraction is reduced in an application.
                 def freshened = abstractionTerm.expr.freshen(term.freeVariables)
                 return freshened.substitute(abstractionTerm.boundVar, term)

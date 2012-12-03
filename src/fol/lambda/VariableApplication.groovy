@@ -15,11 +15,6 @@ class VariableApplication extends SingleTerm {
         term = t
     }
 
-    VariableApplication alphaConversion(Variable from, Variable to) {
-        def v = boundAbstractionVar == from ? to : boundAbstractionVar
-        new VariableApplication(v, term.alphaConversion(from, to))
-    }
-
     SingleTerm substitution(Variable v, SingleTerm e) {
         if (v == boundAbstractionVar) {
             if (e instanceof Variable) {    // alpha-conversion of this boundAbstractionVar
@@ -33,7 +28,7 @@ class VariableApplication extends SingleTerm {
     }
 
     TermList reduction() {
-        new TermList([this])        // cannot reduce; don't know yet what alphaConversions will be needed
+        new TermList([this])        // cannot reduce; don't know yet what alpha-conversions will be needed
     }
 
     VariableApplication freshen(Collection<Variable> forbiddenVars) {
