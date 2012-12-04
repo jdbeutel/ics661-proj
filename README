@@ -1,25 +1,18 @@
-J. David Beutel  ICS 661 assignment 4  2012-10-08
+J. David Beutel  ICS 661 project  2012-12-05
 
-I compiled and ran with Groovy 1.8.7 on Fedora 14,
-from the command line in the assignment4 directory, like so:
+Requires: Groovy 2.0.5 (and Java)
 
-    groovy assignment4 L1-CNF.grammar < sampleInput
+To compile and run all three from the command line:
+$ cd src
+$ groovy parser/cky/CkyParser ../L1.grammar < ../probabilityInput
+$ groovy parser/earley/EarleyParser.groovy ../L1.grammar < ../probabilityInput
+$ groovy SemanticGrammar < ../semanticInput
 
-Other versions may also work.  The Groovy script and its dependencies
-compile automatically.  The source is assignment4.groovy, CkyParser.groovy,
-and (largely from assignment3) Grammar.groovy.  It will convert the
-given grammar to CNF if it is not already.
-
-The transcript of the test run on sampleInput is in the "transcript" file.
-I implemented the extra credit to show all possible parses.
-
-Also, each testing spec can be run from the command line, as shown below.
-(Change : to ; and / to \ if running on Windows.)
+The testing specs cannot be so simply run from the command line,
+since I split the source into separate src and test root dirs.
 I developed in IntelliJ IDEA Ultimate 11.1, which can show a diff in the
 GUI when a spec fails.  I included the IntelliJ project files in this zip,
-assignment4.iml and the contents of the .idea directory.
+ics661proj.iml and the contents of the .idea directory.
 
-$ groovy -version
-Groovy Version: 1.8.7 JVM: 1.6.0_20 Vendor: Sun Microsystems Inc. OS: Linux
-$ groovy -cp "lib/junit-4.9.jar:lib/spock-core-0.6-groovy-1.8.jar" CkyParserSpec
-JUnit 4 Runner, Tests: 11, Failures: 0, Time: 699
+I tested in Fedora 14 and
+Groovy Version: 2.0.5 JVM: 1.6.0_20 Vendor: Sun Microsystems Inc. OS: Linux
