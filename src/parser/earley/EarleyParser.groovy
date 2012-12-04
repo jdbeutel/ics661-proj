@@ -100,7 +100,7 @@ class EarleyParser extends Parser {
     }
 
     @Override
-    List getCompletedParses() {
+    List<EarleyState> getCompletedParses() {
         def N = words.size()
         def fullParses = chart[N].findAll {it.complete && it.inputStartIdx == 0 && it.inputDotIdx == N} // [0,N]
         def sParses = fullParses.findAll {it.rule.nonTerminal == grammar.startSymbol}   // all S for [0,N]
