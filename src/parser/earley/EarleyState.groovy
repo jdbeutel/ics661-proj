@@ -77,16 +77,22 @@ class EarleyState implements Parse {
      */
     @Override
     String toString() {
-        def attach = ''
-        if (rule.attachment) {
-            attach = " {${Attachment.canonicalProbability(probability)}}"
-        }
         def subtrees = []
         for (i in 0..<rule.symbols.size()) {
             def s = rule.symbols[i]
             subtrees << (i < dotIdx && s in rule.nonTerminalSymbols ? components[i] : s)
         }
-        "[$name ${rule.nonTerminal} ${subtrees.join(' ')} ($inputStartIdx,$inputDotIdx)$attach]"
+        "[$name ${rule.nonTerminal} ${subtrees.join(' ')} ($inputStartIdx,$inputDotIdx)$attachmentStr]"
+    }
+
+    private String getAttachmentStr() {
+        if (rule.attachment) {
+            def p = Attachment.canonicalProbability(probability)    // of current subtree, not the rule.attachment's
+            Closure cl = rule.attachment.lambda
+            return cl ? " {$p, ${cl(this)}}" : " {$p}"
+        } else {
+            return ''
+        }
     }
 
     String toFlatString() {
@@ -102,9 +108,9 @@ class EarleyState implements Parse {
                 def c = components[i]
                 subtrees << (c ? c.prettyPrint(level+1) : indent + indentBy + rule.symbols[i])
             }
-            return "$indent[${rule.nonTerminal}${subtrees.join('')}$indent]"
+            return "$indent[${rule.nonTerminal}${subtrees.join('')}$indent$attachmentStr]"
         } else {
-            return "$indent[${rule.nonTerminal} ${rule.symbols.join(' ')}]"
+            return "$indent[${rule.nonTerminal} ${rule.symbols.join(' ')}$attachmentStr]"
         }
     }
 
