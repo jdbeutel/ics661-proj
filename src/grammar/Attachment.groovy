@@ -10,7 +10,7 @@ import fol.FirstOrderLogic
  */
 class Attachment {
     BigDecimal probability
-    Closure lambda
+    Closure lambdaClosure
 
     Attachment(String content) {
         def idx = content.indexOf(',')
@@ -27,17 +27,17 @@ class Attachment {
 
     private void parseLambda(String s) {
         if (s ==~ /\$\d/) {                         // e.g., Nominal -> Noun  [1.0, $0]
-            lambda = { EarleyState es ->
+            lambdaClosure = { EarleyState es ->
                 es.components[s[1] as int].lambda
             }
         } else if (s ==~ /\$\d\(\$\d\)/) {          // e.g., S -> NP VP  [1.0, $0($1)]
-            lambda = { EarleyState es ->
+            lambdaClosure = { EarleyState es ->
                 SingleTerm x = es.components[s[1] as int].lambda
                 SingleTerm y = es.components[s[4] as int].lambda
                 new Application(abstractionTerm: x, term: y)
             }
         } else {                                    // e.g., Noun -> restaurant [1.0, λr.Restaurant(r)]
-            lambda = { FirstOrderLogic.parseLambda(s) }
+            lambdaClosure = { FirstOrderLogic.parseLambda(s) }
         }
     }
 

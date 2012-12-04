@@ -88,7 +88,7 @@ class EarleyState implements Parse {
     private String getAttachmentStr() {
         if (rule.attachment) {
             def p = Attachment.canonicalProbability(probability)    // of current subtree, not the rule.attachment's
-            Closure cl = rule.attachment.lambda
+            Closure cl = rule.attachment.lambdaClosure
             return cl ? " {$p, ${cl(this)}}" : " {$p}"
         } else {
             return ''
@@ -135,7 +135,7 @@ class EarleyState implements Parse {
     }
 
     SingleTerm getLambda() {
-        def x = rule.attachment?.lambda?.call(this)
+        def x = rule.attachment?.lambdaClosure?.call(this)
         if (x instanceof TermList) {
             assert x.size() == 1        // S -> foo wraps in TermList
             return (SingleTerm) x[0]
