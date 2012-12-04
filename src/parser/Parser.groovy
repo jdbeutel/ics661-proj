@@ -100,6 +100,3 @@ abstract class Parser {
     }
 }
 
-interface Parse {
-    String prettyPrint(int level)
-}
