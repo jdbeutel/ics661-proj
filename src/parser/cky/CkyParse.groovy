@@ -2,11 +2,12 @@ package parser.cky
 
 import grammar.Attachment
 import grammar.Rule
+import parser.Parse
 
 /**
  * A node (i.e., subtree) in a CKY parse tree.
  */
-class CkyParse {
+class CkyParse implements Parse {
     Rule rule   // A -> B C, or A -> terminal
     CkyParse B, C
 
@@ -37,6 +38,21 @@ class CkyParse {
     BigDecimal getProbability() {
         def p = rule.probability
         p == null || rule.terminalForm ? p : p * B.probability * C.probability
+    }
+
+    String prettyPrint(int level = 0) {
+        def indentBy = ' ' * 4
+        def indent = '\n' + (indentBy * level)
+        def attach = ''
+        if (rule.attachment) {
+            attach = " {${Attachment.canonicalProbability(probability)}}"
+        }
+        if (rule.terminalForm) {
+            assert !B && !C
+            "$indent[${rule.nonTerminal} ${rule.symbols[0]}$attach]"
+        } else {
+            "$indent[${rule.nonTerminal}${B.prettyPrint(level+1)}${C.prettyPrint(level+1)}$indent$attach]"
+        }
     }
 
     /**

@@ -3,7 +3,7 @@ package fol.lambda
 import groovy.transform.EqualsAndHashCode
 
 /**
- * AtomicFormula -> AbstractionVariable ( TermOrFormula )
+ * VariableApplication -> AbstractionVariable ( TermOrFormula )
  */
 @EqualsAndHashCode
 class VariableApplication extends SingleTerm {

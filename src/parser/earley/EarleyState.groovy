@@ -5,6 +5,7 @@ import grammar.Rule
 import groovy.transform.EqualsAndHashCode
 import fol.lambda.SingleTerm
 import fol.lambda.TermList
+import parser.Parse
 
 /**
  * Chart entries in an Earley parse.
@@ -13,7 +14,7 @@ import fol.lambda.TermList
  * which could map different completed components to the same state (as an optimization).
  */
 @EqualsAndHashCode(excludes = ['function', 'name'])
-class EarleyState {
+class EarleyState implements Parse {
 
     Rule rule
     int dotIdx

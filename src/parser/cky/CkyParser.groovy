@@ -88,4 +88,24 @@ class CkyParser extends Parser {
         }
         s
     }
+
+    /**
+     * For running from the command line (from the "src" dir),
+     * this loads a grammar file and uses it to parse lines from stdin.
+     *
+     * @param args  command line arguments
+     */
+    static void main(String[] args) {
+
+        if (args.size() != 1) {
+            System.err.println "usage: groovy parser/cky/CkyParser grammarFile < sentenceLines"
+            System.exit 1
+        }
+
+        def g = new Grammar(new File(args[0]))
+        System.in.eachLine {line ->
+            println "\n$line: " + new CkyParser(line, g).prettyCompletedParsesString
+            null    // just avoiding a warning about not returning a value from eachLine
+        }
+    }
 }

@@ -26,7 +26,7 @@ abstract class Parser {
     /**
      * @return a list of roots of all accepted, full parse trees, or the empty list if none are accepted
      */
-    abstract List getCompletedParses()
+    abstract List<Parse> getCompletedParses()
 
     /**
      * Renders all accepted, full parses as required for assignment 4.
@@ -35,6 +35,16 @@ abstract class Parser {
      */
     String getCompletedParsesString() {
         completedParses?.join(';') ?: "not ${grammar.startSymbol}"
+    }
+
+    /**
+     * Renders all accepted, full parses into easy-to-read indentation.
+     *
+     * @return a rendering of all possible parses, or "not S" if none are accepted
+     */
+    String getPrettyCompletedParsesString() {
+        // using Parser.prettyPrint(), not the static prettyPrint() below.
+        completedParses*.prettyPrint(0).join('\n;') ?: "not ${grammar.startSymbol}"
     }
 
     /**
@@ -88,4 +98,8 @@ abstract class Parser {
         }
         sb << '\n' + ' ' * (level*4)
     }
+}
+
+interface Parse {
+    String prettyPrint(int level)
 }
