@@ -26,7 +26,10 @@ class EarleyParser extends Parser {
 
     /**
      * Parses this parser's line of words, according to its grammar.
-     * This is the Earley algorithm from the textbook.
+     * This is the Earley algorithm from the textbook, which has an optimization
+     * of the original algorithm to avoid adding a lexicon's whole set of terminals
+     * to the chart.  But, I enhanced that to support FOL, to also allow terminals
+     * in non-terminal rules (i.e., non-lexicons), with the advancing() method.
      */
     private void parse() {
         enqueue(dummyStartState, chart[0])
@@ -49,11 +52,21 @@ class EarleyParser extends Parser {
         }
     }
 
+    /**
+     * This is used to start the parse chart, but is not advanced to completion.
+     *
+     * @return the dummy start state
+     */
     private getDummyStartState() {
         Rule dummy = Rule.valuesOf("γ -> ${grammar.startSymbol}", grammar)[0]
         new EarleyState(dummy, 0, [0, 0], 'dummy start state')
     }
 
+    /**
+     * Enqueue a new state for every rule that, if completed, would advance the dot in the given state.
+     *
+     * @param state to look forward (i.e., top-down) on how to advance
+     */
     private void predictor(EarleyState state) {
         def B = state.b
         def j = state.inputDotIdx
@@ -62,6 +75,14 @@ class EarleyParser extends Parser {
         }
     }
 
+    /**
+     * Works backwards from the next input word,
+     * to enqueue a state for every matching terminal rule.
+     * This is an optimization by the textbook, limiting it to the actual input word,
+     * to avoid enqueueing a state for every terminal in the lexicon.
+     *
+     * @param state with the dot on a terminal rule
+     */
     private void scanner(EarleyState state) {
         def B = state.b
         def j = state.inputDotIdx
@@ -73,6 +94,12 @@ class EarleyParser extends Parser {
         }
     }
 
+    /**
+     * Fixes the textbook's optimization to support grammars with terminals in non-terminal rules, like FOL.
+     * This advances the state over the next input word, if the state's next symbol matches it.
+     *
+     * @param state with the dot on a terminal symbol
+     */
     private void advancing(EarleyState state) {
         def j = state.inputDotIdx
         if (words[j] == state.b) {
@@ -80,6 +107,11 @@ class EarleyParser extends Parser {
         }
     }
 
+    /**
+     * Advances states satisfied by the completion of the given state.
+     *
+     * @param state completed state
+     */
     private void completer(EarleyState state) {
         def B = state.rule.nonTerminal
         def j = state.inputStartIdx
@@ -92,6 +124,12 @@ class EarleyParser extends Parser {
 
     private enqueueSequence = 0
 
+    /**
+     * Adds a state to the given chartEntry, if it is not already in it, assigning the state a sequential name.
+     *
+     * @param state to add to chartEntry
+     * @param chartEntry in which to enqueue the state
+     */
     private void enqueue(EarleyState state, List<EarleyState> chartEntry) {
         if (!(state in chartEntry)) {
             state.name = "S${enqueueSequence++}"
@@ -99,6 +137,10 @@ class EarleyParser extends Parser {
         }
     }
 
+    /**
+     *
+     * @return a list of roots of all accepted, full parse trees, or the empty list if none are accepted
+     */
     @Override
     List<EarleyState> getCompletedParses() {
         def N = words.size()

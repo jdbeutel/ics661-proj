@@ -9,6 +9,7 @@ import fol.lambda.*
 
 /**
  * First-Order Logic with Lambda notation.
+ * The grammar is based on textbook figure 17.3, plus λ-notation.
  * This supports λ-reductions (a.k.a. β-reductions),
  * but does not go so far as to perform logical inference or productions.
  */
