@@ -12,7 +12,7 @@ abstract class Parser {
     Grammar grammar
 
     /**
-     * Constructs a CkyParser, parsing the given line with the given Grammar.
+     * Constructs a Parser, parsing the given line with the given Grammar.
      *
      * @param line the line of words to parse (i.e., a sentence)
      * @param g the grammar to use for the parse
