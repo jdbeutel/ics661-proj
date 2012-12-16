@@ -43,7 +43,7 @@ abstract class Parser {
      * @return a rendering of all possible parses, or "not S" if none are accepted
      */
     String getPrettyCompletedParsesString() {
-        // using Parser.prettyPrint(), not the static prettyPrint() below.
+        // using Parse.prettyPrint(), not the static prettyPrint() below.
         completedParses*.prettyPrint(0).join('\n;') ?: "not ${grammar.startSymbol}"
     }
 
